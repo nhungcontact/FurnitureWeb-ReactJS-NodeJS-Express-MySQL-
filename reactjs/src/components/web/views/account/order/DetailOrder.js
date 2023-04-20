@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getDetailOrdersByOrderId } from "../../../../services/orderService";
-import { IMG_URL } from "../../../../config/imgUrl";
+// import { IMG_URL } from "../../../../config/imgUrl";
 const DetailOrder = (props)=>{
     const [listDetail,setListDetail]=useState([]);
     const [orderId]=useState(props.id);

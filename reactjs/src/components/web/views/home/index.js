@@ -45,35 +45,35 @@ const Home = ()=>{
             </div>
             <NewProduct />
             <div className="section_policy">
-                <div className="container">
+                <div className="container-fluid">
                     <div className="row">
                         <div className="col-lg-3 col-md-6 col-sm-6 col-12 giaohang">
                             <i className="fa-solid fa-truck-fast"></i>
                             <div className="text">
-                                <b>GIAO HÀNG MIỄN PHÍ</b>
-                                <p>Với đơn trên 300.000 đ</p>
+                                <b>Free Delivery</b>
+                                <p>Free shipping on all order</p>
                             </div>                    
                         </div>
                         <div className="col-lg-3 col-md-6 col-sm-6 col-12 giaohang">
                         <i className="fa-brands fa-creative-commons-sampling"></i>
 
                             <div className="text">
-                                <b>HỖ TRỢ 24/7</b>
-                                <p>Nhanh chóng thuận tiện</p>
+                                <b>Online Support 24/7</b>
+                                <p>Online support 24 hours a day</p>
                             </div>                    
                         </div>
                         <div className="col-lg-3 col-md-6 col-sm-6 col-12 giaohang">
                         <i className="fa-solid fa-box-open"></i>
                             <div className="text">
-                                <b>ĐỔI TRẢ 3 NGÀY</b>
-                                <p>Hấp dẫn chưa từng có</p>
+                                <b>Money Return</b>
+                                <p>Back guarantee under 7 days</p>
                             </div>                    
                         </div>
                         <div className="col-lg-3 col-md-6 col-sm-6 col-12 giaohang">
                         <i className="fa-solid fa-clipboard-list"></i>
                             <div className="text">
-                                <b>GIÁ TIÊU CHUẨN</b>
-                                <p>Tiết kiệm 10% giá cả</p>
+                                <b>Member Discount</b>
+                                <p>On every order over 500.000đ</p>
                             </div>                    
                         </div>
                     </div>

@@ -5,7 +5,7 @@ import { getAllAddressByUserId } from "../../../services/addressService";
 import ModalChangeAddress from "./ModalChangeAddress";
 import Swal from "sweetalert2";
 import { addOrder } from "../../../services/orderService";
-import { deleteAllCart, removeOrder } from "../../../services/cartService";
+import { deleteAllCart } from "../../../services/cartService";
 import { Link } from "react-router-dom";
 // import ModalChangeAddress from "./ModalChangeAddress";
 const CheckoutDetail = ()=>{

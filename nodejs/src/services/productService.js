@@ -120,6 +120,36 @@ let getProductByName = (productName) =>{
     })
 }
 
+let getProductByNameSearch = (search) =>{
+    return new Promise( async(resolve,reject)=>{
+        console.log(search);
+        try {
+            const product = await db.Product.findAll({
+                where: {
+                    [Op.or]:{name:{
+                        [Op.like]:'%'+search+'%'
+                    }}
+                },
+                raw: true,
+                include:[{
+                    model: db.Category,
+                    as:'categories'
+                }],
+            })
+            // tim thay (product khac rong)
+            if(product){
+                resolve(product)
+            }else{
+                resolve('')
+            }
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+
+
 
 let createNewProduct = (data,file) => {
     return new Promise(async(resolve,reject)=>{
@@ -505,6 +535,7 @@ module.exports = {
     getProductsWithSearchPagination:getProductsWithSearchPagination,
     getProductsByCategory:getProductsByCategory,
     getProductByName: getProductByName,
+    getProductByNameSearch:getProductByNameSearch,
 
     // C-U-D product
     createNewProduct: createNewProduct,

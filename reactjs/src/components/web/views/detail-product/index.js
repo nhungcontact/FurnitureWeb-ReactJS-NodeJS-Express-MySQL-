@@ -117,6 +117,12 @@ const DetailProduct = ()=>{
         <hr />
         <div className="container detail_product">
             <h2 className="py-4 text-center">Detail Product</h2>
+            {/* <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="fdsf">Product</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Detail</li>
+                </ol>
+            </nav> */}
             <div className="row py-3">
                 <div className="col-md-6 detail_product_img">
                    <div>
@@ -136,6 +142,7 @@ const DetailProduct = ()=>{
                    </div>
                 </div>
                 <div className="col-md-6 detail_product_content">
+                    <div className='container'>
                     <h4>{product.name}</h4>
                     <h5 className='text-danger'>{product.discountPer ? new Intl.NumberFormat().format(product.discount):new Intl.NumberFormat().format(product.price)}đ <del className="card-price-old">{product.discountPer ? new Intl.NumberFormat().format(product.price): ''}</del></h5>
                     <hr/>
@@ -181,6 +188,7 @@ const DetailProduct = ()=>{
                     </div>
                     <div className='col-12'>
                     <button className="btn_add_cart px-5" type="submit" name="addcart" onClick={addToCart}>Add To Cart</button>
+                    </div>
                     </div>
                 </div>
             </div>

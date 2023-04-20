@@ -65,7 +65,7 @@ const SideBar =(props)=>{
                                 aria-expanded={openNews}
                                 
                             >
-                            <i class="fa-regular fa-newspaper"></i> News
+                            <i class="fa-regular fa-newspaper"></i> Blog
                             </span>
                             <Collapse in={openNews}>
                                 <ul id="type-product">

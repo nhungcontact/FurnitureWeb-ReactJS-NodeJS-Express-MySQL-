@@ -1,5 +1,5 @@
 import db from "../models/index";
-const { Op } = require("sequelize");
+// const { Op } = require("sequelize");
 
 let getAllBlogs = (blogId) =>{
     return new Promise(async(resolve,reject)=>{
@@ -43,17 +43,17 @@ let getBlogsByName=(blogName)=>{
     })
 }
 
-let createNewBlogs = (data,file) => {
+let createNewBlog = (data,file) => {
     return new Promise(async(resolve,reject)=>{
         try { 
-            await db.Blogs.create({
+            await db.Blog.create({
                 name: data.name,
                 photo: file.filename,
                 writer: data.writer,
                 slug: data.slug,
                 content: data.content,
                 hidden: data.hidden,
-                new: data.new,
+                newBlog: data.newBlog,
             })
             resolve({
                 errCode: 0,
@@ -128,9 +128,8 @@ let updateBlogData = (data)=>{
 
 module.exports = {
     getAllBlogs:getAllBlogs,
-    getBlogWithPagination:getBlogWithPagination,
     getBlogsByName:getBlogsByName,
-    createNewBlogs:createNewBlogs,
+    createNewBlog:createNewBlog,
     updateBlogData:updateBlogData,
     deleteBlog:deleteBlog
 }

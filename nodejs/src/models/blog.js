@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     slug: DataTypes.STRING,
     content: DataTypes.TEXT,
     hidden: DataTypes.BOOLEAN,
-    new:DataTypes.BOOLEAN,
+    newBlog:DataTypes.BOOLEAN,
   }, {
     sequelize,
     modelName: 'Blog',

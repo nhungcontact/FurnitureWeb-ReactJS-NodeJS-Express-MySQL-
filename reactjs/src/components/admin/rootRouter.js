@@ -12,9 +12,9 @@ import ListColor from "./views/product-color/list";
 import ListUser from "./views/user";
 import ListCategory from "./views/category/list";
 import './css/style.css';
-// import ListBlogs from "./view/Blog/List";
-// import AddBlogs from "./view/Blog/AddBlog";
-
+import AddBlog from "./views/blog/add";
+import ListBlog from "./views/blog/list";
+import EditBlog from "./views/blog/edit";
 const RootRouter =()=>{
     
     const [isHide,setIsHide]=useState(false);
@@ -60,8 +60,9 @@ const RootRouter =()=>{
                     <Route path="color" element={<ListColor />} />
 
                     <Route path="users" element={<ListUser />} />
-                    {/* <Route path="list-blog" element={<ListBlogs />} />
-                    <Route path="add-blog" element={<AddBlogs />} /> */}
+                    <Route path="list-blog" element={<ListBlog />} />
+                    <Route path="add-blog" element={<AddBlog />} />
+                    <Route path="edit-blog/:id" element={<EditBlog />} />
                 </Routes>
             </div>
         </div>

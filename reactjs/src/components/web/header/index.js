@@ -1,6 +1,5 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
-import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
@@ -10,17 +9,16 @@ import { Link } from 'react-router-dom';
 import { getUserByEmail, isAuthenticate, logout } from '../../services/userService';
 import { useEffect, useState } from 'react';
 import { getCartByUserId } from '../../services/cartService';
-// style={{position: "absolute"}}
 const Header =()=> {
-//     const [show, setShow] = useState(false);
-
-//   const handleClose = () => setShow(false);
-//   const handleShow = () => setShow(true);
   const [token,setToken]=useState('');
   const [username,setUsername]=useState('');
   const [userId,setUserId]=useState('');
 
   const [qtyCart,setQtyCart] = useState(0);
+  const [search,setSearch]=useState('');
+
+  const location = useLocation();
+  console.log(location);
   
   useEffect(()=>{
     getUser();
@@ -45,8 +43,6 @@ const Header =()=> {
 
   const getCart = async()=>{
     const cart = await getCartByUserId(userId);
-    
-    console.log(cart);
     if(cart && cart.data.errCode === 0){
       setQtyCart(cart.data.carts.length);
     }
@@ -55,39 +51,19 @@ const Header =()=> {
     // event.preventDefault();
     await logout();
 }
+// const handleSearchClick=(e)=>{
+//   if(!e.target.value){
+//     alert('Empty!')
+//   }
+// }
+const handleDeleteSearch = ()=>{
+  var search = '';
+  setSearch(search);
+}
   return (
-    <div className='header'>
-        <div className='d-flex align-items-center justify-content-between px-4 py-2'>
-            <div className='header-phone-contact'>
-                <span>
-                    <i className="fa-solid fa-phone-volume"></i> 
-                    HotLine: <a href='tel: 19006777'>19006777</a>
-                </span>
-            </div>
-            <div className='header-auth d-flex'>
-              <span style={token ? { display: 'none' } : { display: 'block' }}>
-              <Link to="register" className='sign-up'>Register</Link>
-                <Link to="login" className='pe-3'>Login</Link>
-              </span>
-              <Dropdown style={token ? { display: 'block' } : { display: 'none' }}>
-                    <Dropdown.Toggle variant="success" id="dropdown-basic">
-                    {username}
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-                        <Link to="account" className="dropdown-item">Account</Link>
-                        <Link to="account/address" className="dropdown-item">My address</Link>
-                        <Dropdown.Item href="#/action-3" onClick={handleLogout}>Log out</Dropdown.Item>
-                    </Dropdown.Menu>    
-                </Dropdown>
-                
-                <Link to="cart" className='header-cart'>
-                    <i className="fa-solid fa-basket-shopping"></i>
-                    <span className='number'>{qtyCart}</span>
-                </Link>
-            </div>
-        </div>
+    <div className='header'>        
         <Navbar key="lg" expand="lg" className="header-nav">
-          <Container>
+          <div className='container-fluid px-5'>
             <Navbar.Brand href="#" className='logo'>HOME's</Navbar.Brand>
             <Navbar.Toggle aria-controls="offcanvasNavbar-expand-lg" />
             <Navbar.Offcanvas
@@ -102,40 +78,62 @@ const Header =()=> {
               </Offcanvas.Header>
               <Offcanvas.Body>
                 
-                <Nav className="justify-content-center flex-grow-1 p-3">
+                <Nav className="justify-content-center flex-grow-1 py-3">
                   <NavLink className={(navData) => navData.isActive ? "active" : "first after" } to="" end>HOME</NavLink>
-                  <NavLink className={(navData) => navData.isActive ? "active" : "first after" } to="introduce">INTRODUCE</NavLink>
+                  <NavLink className={(navData) => navData.isActive ? "active" : "first after" } to="about">ABOUT</NavLink>
                   <NavLink className={(navData) => navData.isActive ? "active" : "first after" } to="product">PRODUCT</NavLink>
-                  {/* <NavDropdown
-                    title="SẢN PHẨM"
-                    id="offcanvasNavbarDropdown-expand-lg"
-                  >
-                    <NavDropdown.Item className={(navData) => navData.isActive ? "active" : "first after" } href="#action3">Action</NavDropdown.Item>
-                    <NavDropdown.Item className={(navData) => navData.isActive ? "active" : "first after" } href="#action4">
-                      Another action
-                    </NavDropdown.Item>
-                    <NavDropdown.Divider />
-                    <NavDropdown.Item className={(navData) => navData.isActive ? "active" : "first after" } href="#action5">
-                      Something else here
-                    </NavDropdown.Item>
-                  </NavDropdown> */}
-                  <NavLink className={(navData) => navData.isActive ? "active" : "first after" } to="blog">BLOGS</NavLink>
-                  <NavLink className={(navData) => navData.isActive ? "active" : "first after" } to="contact">CONTACT</NavLink>
+                  <NavLink className={(navData) => navData.isActive ? "active" : "first after" } to="blog">BLOG</NavLink>
                 </Nav>
-                <div className='header-search'>
-                    <Form className="d-flex form-search">
-                        <Form.Control
-                        type="search"
-                        placeholder="Tìm kiếm"
-                        className="me-2"
-                        aria-label="Search"
-                        />
-                        <Button><i className="fa-solid fa-magnifying-glass"></i></Button>
-                    </Form> 
+                <div className='d-flex'>
+                  <div className='header-search pe-4'>
+                      <Form className="d-flex form-search" action='search' method='GET'>
+                          <Form.Control
+                          type="text"
+                          placeholder="Search Product"
+                          className="me-2"
+                          aria-label="Search"
+                          name="search"
+                          value={search}
+                          onChange={e => setSearch(e.target.value)}
+                          />
+                          {search ?
+                            <Button onClick={handleDeleteSearch}><i className="fa-solid fa-xmark"></i></Button>
+                            :
+                            <Button><i className="fa-solid fa-magnifying-glass"></i></Button>
+                          }
+                      </Form> 
+                  </div>
+                  <div className='header-auth d-flex align-items-center'>
+                    <span style={token ? { display: 'none' } : { display: 'block' }}>
+                    <Link to="register" className='sign-up d-flex align-items-center'>
+                    <i class="fa-regular fa-user px-1" style={{fontSize:"21px",color:"#e74c3c"}}></i>
+                    <span className='pb-3 px-0'>
+                    <span style={{color:"#888888",fontSize:"10px"}}>Register</span>
+                    <p style={{fontSize:"14px",margin:"0px",fontWeight:"500",lineHeight:"10px",color:"#e74c3c"}}>Account</p>
+                    </span>
+                    </Link>
+                      {/* <Link to="login" className='pe-3'>Login</Link> */}
+                    </span>
+                    <Dropdown style={token ? { display: 'block' } : { display: 'none' }}>
+                          <Dropdown.Toggle variant="success" id="dropdown-basic">
+                          {username}
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu>
+                              <Link to="account" className="dropdown-item"><i class="fa-regular fa-user pe-2"></i> Account</Link>
+                              <Link to="account/address" className="dropdown-item"><i class="fa-regular fa-address-book pe-2"></i> My address</Link>
+                              <Dropdown.Item href="#/action-3" onClick={handleLogout}><i class="fa-solid fa-arrow-right-from-bracket pe-2"></i> Log out</Dropdown.Item>
+                          </Dropdown.Menu>    
+                      </Dropdown>
+                      
+                      <Link to="cart" className='header-cart pb-1'>
+                      <svg style={{color:"#e74c3c"}} xmlns="http://www.w3.org/2000/svg" width="26" height="20" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16"> <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/> </svg>
+                          <span className='number'>{qtyCart}</span>
+                      </Link>
+                  </div>
                 </div>
               </Offcanvas.Body>
             </Navbar.Offcanvas>
-          </Container>
+          </div>
         </Navbar>
     </div>
   );

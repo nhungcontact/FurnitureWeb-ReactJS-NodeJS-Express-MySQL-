@@ -16,7 +16,7 @@ const Category = ()=>{
         <div className="row">
             {arrCategory && arrCategory.map((item)=>{
                 return(
-                    <div className="my-2" href="sa" key={item.id}>{item.name}</div>
+                    <div className="mb-2" href="sa" key={item.id}>{item.name}</div>
                 )
             })}
             

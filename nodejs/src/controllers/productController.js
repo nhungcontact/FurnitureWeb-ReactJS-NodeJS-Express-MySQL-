@@ -17,6 +17,23 @@ let handleGetAllProducts = async(req,res) => {
         products 
     })
 }
+let handleGetSearchProducts = async(req,res) => {
+    let search = req.query.search;
+    if(!search){
+        return res.status(200).json({
+            errCode: 1,
+            errMessage: 'Missing required parameters',
+            products : []
+        })
+    }
+    let products = await productService.getProductByNameSearch(search);
+    // console.log(products)
+    return res.status(200).json({
+        errCode: 0,
+        errMessage: 'OK',
+        products 
+    })
+}
 
 let handleGetAllProductsSearchPagination = async(req,res)=>{
     let {search,page,limit}= req.query;
@@ -92,7 +109,6 @@ let handleGetDetailProduct = async(req,res)=>{
 }
 
 let handleCreateNewProduct = async(req,res) => {
-    console.log(req.body)
     let message = await productService.createNewProduct(req.body,req.file);
     return res.status(200).json(message);
 }
@@ -160,6 +176,7 @@ let handleCreateProductColor = async(req,res) => {
 
 module.exports = {
     handleGetAllProducts: handleGetAllProducts,
+    handleGetSearchProducts:handleGetSearchProducts,
 
     handleCreateNewProduct: handleCreateNewProduct,
     handleEditProduct: handleEditProduct,

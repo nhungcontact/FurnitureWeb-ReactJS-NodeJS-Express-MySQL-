@@ -27,7 +27,7 @@ module.exports = {
       hidden: {
         type: Sequelize.BOOLEAN
       },
-      new:{
+      newBlog:{
         type:Sequelize.BOOLEAN
       },
       createdAt: {

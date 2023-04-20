@@ -89,7 +89,6 @@ const Address = ()=>{
             if (result.isConfirmed) {
                 try {
                     let res = await updateAddress(data);
-                    console.log("do edit:",res);
                     if(res && res.data.errCode===0){
                         setIsOpenModalEditAddress(false)
                         await getAddressFromReact()

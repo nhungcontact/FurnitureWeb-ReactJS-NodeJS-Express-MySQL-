@@ -6,6 +6,7 @@ import categoryController from '../controllers/categoryController';
 import cartController from '../controllers/cartController';
 import addressController from '../controllers/addressController';
 import orderController from '../controllers/orderController';
+import blogController from '../controllers/blogController';
 import multer from "multer";
 // import path from 'path';
 
@@ -23,6 +24,17 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage })
 
 let initWebRoutes = (app) => {
+
+    router.get('/',homeController.getHomePage);
+    router.get('/crud',homeController.getCRUD);
+
+    router.post('/post-crud',homeController.postCRUD);
+    router.get('/get-crud',homeController.displayGetCRUD);
+
+    router.get('/edit-crud',homeController.getEditCRUD);
+    router.post('/put-crud',homeController.putCRUD);
+    
+    router.get('/delete-crud',homeController.deleteCRUD);
 
     router.post('/api/login',userController.handleLogin);
     router.post('/api/register',userController.handleRegister);
@@ -50,6 +62,7 @@ let initWebRoutes = (app) => {
     router.use('/assets/images/',express.static(IMAGE_PATH));
     router.get('/api/get-all-product-by-category', productController.handleGetProductByCategory);
     router.get('/api/get-all-productphoto', productController.handleGetAllProductPhoto);
+    router.get('/api/get-product-by-search-name', productController.handleGetSearchProducts);
     // router.put('/api/edit-product',productController.handleEditproduct);
     router.delete('/api/delete-product',productController.handleDeleteProduct);
     
@@ -76,6 +89,9 @@ let initWebRoutes = (app) => {
     router.get('/api/get-detailorders-by-order', orderController.handleGetDetailOrdersByOderId);
     router.post('/api/add-order', orderController.handleAddOrder);
     // router.put('/api/update-address',addressController.handleUpdateAddress);
+
+    router.get('/api/get-all-blogs', blogController.handleGetAllBlogs);
+    router.post('/api/create-new-blog', upload.single('photo'),blogController.handleCreateBlog);
 
 
     return app.use("/", router);

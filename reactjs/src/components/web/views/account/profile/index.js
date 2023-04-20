@@ -37,6 +37,7 @@ const Profile = ()=>{
     }
     useEffect(()=>{
         getUserFromReact();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     },[]);
     
     const getUserFromReact = async()=>{

@@ -1,21 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "reactstrap";
 import swal from 'sweetalert2';
 import RichTextEditor from "../../RichTextEditor";
-import { createBlog } from "../../../../services/blogService";
+import { useParams } from "react-router-dom";
+import { IMG_URL } from "../../../../config/imgUrl";
+import { getAllBlogs } from "../../../../services/blogService";
+const EditBlog =()=>{
 
-const AddBlog =()=>{
+    const {id} = useParams();
 
-    const [arrInput,setArrProduct]=useState({
-        name: '',photo:'',writer:'',slug:'',content:'',hidden:false,newBlog:false
+
+    const [arrEditBlog,setArrEditBlog]=useState({
+        id:'',name: '',photo:'',writer:'',slug:'',content:'',hidden:'',newBlog:''
     });
     const [urlPhoto,setUrlPhoto]=useState({
         imagePreview:''
     });
-
     const handleOnChange=(e)=>{
         const {name,value}= e.target;
-        setArrProduct({...arrInput,[name]:value})
+        setArrEditBlog({...arrEditBlog,[name]:value})
     }
     const handleChangeImage = (e)=>{
         const name = e.target.name;
@@ -27,9 +30,9 @@ const AddBlog =()=>{
                 {
                     ...urlPhoto,imagePreview: reader.result,
               });
-              setArrProduct(
+              setArrEditBlog(
                 {
-                    ...arrInput,[name]:file
+                    ...arrEditBlog,[name]:file
               });
             };
             reader.readAsDataURL(file);
@@ -37,8 +40,22 @@ const AddBlog =()=>{
        
     }
     const handleContentChange = contentHtml => {
-        setArrProduct({...arrInput,content:contentHtml})
+        setArrEditBlog({...arrEditBlog,content:contentHtml})
     };
+    
+    useEffect(()=>{
+        getBlogByIdFromReact();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[id])
+   
+
+    const getBlogByIdFromReact =async()=>{
+        const blog =  await getAllBlogs(id);
+        if( (blog && blog.data.errCode === 0)){
+            setArrEditBlog(blog.data.blogs);
+        }
+    }
+    console.log(arrEditBlog);
     
     const formValid = ({...rest }) => {
         console.log(rest);
@@ -49,8 +66,9 @@ const AddBlog =()=>{
         });
         return valid;
     };
+    
     const handleAddNewBlog = ()=>{
-        const {name,photo,writer,slug,content,hidden,newBlog}=arrInput;
+        const {name,photo,writer,slug,content,hidden,newBlog}=arrEditBlog;
         const formData = new FormData();
         formData.append('name',name)
         formData.append('photo',photo)
@@ -58,48 +76,60 @@ const AddBlog =()=>{
         formData.append('slug',slug)
         formData.append('content',content)
         formData.append('hidden',hidden)
-        formData.append('newBlog',newBlog)
-        if(formValid(arrInput)){
-                swal.fire({
-                    title: 'Are you sure?',
-                    text: "You want to Add New Blog?",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Add!'
-                  }).then(async(result) => {
-                    if (result.isConfirmed) {
-                        let list = await createBlog(formData);
-                        if(list.data && list.data.errCode !== 0 ){
-                            swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: list.data.message,
-                                })
-                        }
-                        if(list.data && list.data.errCode === 0 ){
-                            
-                                swal.fire(
-                                    'Add blog!',
-                                    'Your blog has been added.',
-                                    'success'
-                                )
-                                // window.location.href = "/admin/list-blog"
-                        }
-                    }
-                  })
-            
-        }else{
+        formData.append('new',newBlog)
+        if(formValid(arrEditBlog)){
             swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Please check your input!',
+                title: 'Are you sure?',
+                text: "You want to Edit Blog?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Add!'
+              }).then(async(result) => {
+                if (result.isConfirmed) {
+                    // let list = await createBlog(formData);
+                    // if(list.data && list.data.errCode !== 0 ){
+                    //     swal.fire({
+                    //         icon: 'error',
+                    //         title: 'Oops...',
+                    //         text: list.data.message,
+                    //         })
+                    // }
+                    // if(list.data && list.data.errCode === 0 ){
+                        
+                    //         swal.fire(
+                    //             'Add blog!',
+                    //             'Your blog has been added.',
+                    //             'success'
+                    //         )
+                    //         // window.location.href = "/admin/list-blog"
+                    // }
+                }
               })
-        }
+        
+    }else{
+        swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Please check your input!',
+          })
+    }
 
     }
     
+    // const handleSaveUser =()=>{
+        
+    //     let isValid = this.checkValidateInput();
+    //     if(isValid === true){
+    //         // call api edit user modal
+    //         this.props.editUser(this.state);
+    //     }
+    // }
+
+   
+
+
     return(
         <div className="mb-4">
             <div className="row">
@@ -113,11 +143,11 @@ const AddBlog =()=>{
             <ol className="breadcrumb mb-30">
                 <li className="breadcrumb-item"><a href="/">Dashboard</a></li>
                 <li className="breadcrumb-item"><a href="/admin/blog/create">Blog</a></li>
-                <li className="breadcrumb-item active">Create A New Blog</li>
+                <li className="breadcrumb-item active">Edit Blog</li>
             </ol>
             <div className="row">
                 <div className="text-end">
-                    <Button style={{backgroundColor:"#5046e5"}} className="me-3 px-4" onClick={handleAddNewBlog}>Create</Button>
+                    <Button style={{backgroundColor:"#5046e5"}} className="me-3 px-4" onClick={handleAddNewBlog}>Save</Button>
                     </div>
                 <div className="col-md-8">
                     <div className="form-container mt-4">
@@ -128,7 +158,7 @@ const AddBlog =()=>{
                                 <input 
                                     type="text" 
                                     required 
-                                    value={arrInput.name}
+                                    value={arrEditBlog.name}
                                     name="name" 
                                     className="form-control" 
                                     onChange={(event) => handleOnChange(event)} />
@@ -139,7 +169,7 @@ const AddBlog =()=>{
                                 <input 
                                     type="text" 
                                     required 
-                                    value={arrInput.slug}
+                                    value={arrEditBlog.slug}
                                     name="slug" 
                                     className="form-control" 
                                     onChange={(event) => handleOnChange(event)} />
@@ -154,7 +184,7 @@ const AddBlog =()=>{
                                     name="photo"
                                     onChange={(event)=> handleChangeImage(event)}
                                     />
-                                {urlPhoto.imagePreview &&
+                                {/* {urlPhoto.imagePreview &&
                                     <img src={urlPhoto.imagePreview} 
                                         alt="photos" 
                                         className="img-fluid" 
@@ -164,6 +194,15 @@ const AddBlog =()=>{
                                             // height: "200px"
                                             }}/>
                                 }
+                                 */}
+                                 <img src={`${IMG_URL}/${arrEditBlog.photo}`} 
+                                        alt="photos" 
+                                        className="img-fluid" 
+                                        style={{
+                                            margin: "10px",
+                                            // width: "200px",
+                                            // height: "200px"
+                                            }}/>
                             </div>
 
                             <div className="col-12 mb-3">
@@ -171,7 +210,7 @@ const AddBlog =()=>{
                                 <input 
                                     type="text" 
                                     required 
-                                    value={arrInput.writer}
+                                    value={arrEditBlog.writer}
                                     name="writer" 
                                     className="form-control" 
                                     onChange={(event) => handleOnChange(event)} />
@@ -180,7 +219,7 @@ const AddBlog =()=>{
                             <div className="col-12 mb-3">
                                 <label className="form-label">Blog Content<b className="text-danger">*</b>:</label>
                                 <RichTextEditor 
-                                    content={arrInput.content}
+                                    content={arrEditBlog.content}
                                     handleContentChange={handleContentChange}
                                     placeholder="..."                            
                                     // boolean={readOnlyEditor}
@@ -198,7 +237,7 @@ const AddBlog =()=>{
                             <div className="col-12 mb-3">
                                 <label className="form-label">Hidden:</label>
                                 <div class="form-check form-switch">
-                                    <input className="form-check-input" type="checkbox" role="switch" id="hidden" name="hidden" checked={arrInput.hidden} 
+                                    <input className="form-check-input" type="checkbox" role="switch" id="hidden" name="hidden" checked={arrEditBlog.hidden ? '1':''} 
                                         onChange={(e) => {
                                             handleOnChange({
                                             target: {
@@ -215,7 +254,7 @@ const AddBlog =()=>{
                             <div className="col-12">
                                 <label className="form-label">New Blog:</label>
                                 <div class="form-check form-switch">
-                                    <input className="form-check-input" type="checkbox" role="switch" id="newBlog" name="newBlog" checked={arrInput.newBlog} 
+                                    <input className="form-check-input" type="checkbox" role="switch" id="newBlog" name="newBlog" checked={arrEditBlog.newBlog ? '1':''} 
                                         onChange={(e) => {
                                             handleOnChange({
                                             target: {
@@ -235,4 +274,4 @@ const AddBlog =()=>{
         </div>
     )
 }
-export default AddBlog;
+export default EditBlog;

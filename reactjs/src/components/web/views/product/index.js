@@ -15,7 +15,7 @@ const Product= ()=>{
     // const [pagProduct,setPagProduct]=useState([]);
     const [isloaded,setIsLoaded]=useState(false);
     const [offset, setOffset] = useState(0);
-    const [perPage]=useState(4);
+    const [perPage]=useState(20);
     const [currentPage,setCurrentPage]=useState(0);
     const [pageCount,setPageCount]=useState(0);
 
@@ -65,13 +65,13 @@ const Product= ()=>{
     return(
         <div className="products-content">
             <div className="breadcrumb_background_sp">
-                <h1 className="title_bg">Sản phẩm</h1>
+                <h1 className="title_bg">Product</h1>
                 <div className="overlay"></div>
             </div>
             <div className="row py-3 px-4">
                 <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                     <div className="card border mb-3">
-                        <h4 className="card-header" onClick={handleShowSort}>Sort By</h4>
+                        <h5 className="card-header" onClick={handleShowSort}>Filter</h5>
                         <div className="card-body text-dark" style={{display:isShowSort ? "block" : "none" }}>
                             <div className="">
                                 <div className="layered_subtitle dropdown-filter">
@@ -91,15 +91,15 @@ const Product= ()=>{
                                 </div>
                                 <div className="price">
                                     <div className="form-check ">
-                                        <input className="form-check-input" type="checkbox" id="inlineCheckbox1" value="(<1000000)" />
+                                        <input className="form-check-input me-2" type="checkbox" id="inlineCheckbox1" value="(<1000000)" />
                                         <label className="form-check-label" htmlFor="inlineCheckbox1">Dưới 10,000,000₫</label>
                                     </div>
                                     <div className="form-check ">
-                                        <input className="form-check-input" type="checkbox" id="inlineCheckbox2" value="(>=1000000 AND <=1500000)" />
+                                        <input className="form-check-input me-2" type="checkbox" id="inlineCheckbox2" value="(>=1000000 AND <=1500000)" />
                                         <label className="form-check-label" htmlFor="inlineCheckbox2">10,000,000₫ - 15,000,000₫</label>
                                     </div>
                                     <div className="form-check ">
-                                        <input className="form-check-input" type="checkbox" id="inlineCheckbox3" value="(>=1500000 AND <=2000000)" />
+                                        <input className="form-check-input me-2" type="checkbox" id="inlineCheckbox3" value="(>=1500000 AND <=2000000)" />
                                         <label className="form-check-label" htmlFor="inlineCheckbox3">15,000,000₫ - 20,000,000₫</label>
                                     </div>
                                 </div>
@@ -110,16 +110,16 @@ const Product= ()=>{
                     </div>
                 </div>
                 <div className="col-12 col-sm-12 col-md-9 col-lg-9" >
-                    <div className="py-3 row align-items-center">
-                        <h4 className="py-3 col-xxl-9 col-xl-9 col-lg-9 col-md-9 col-sm-12 col-xs-12 col-12 text-xxl-start text-xl-start text-lg-start text-md-center text-sm-center text-xs-center text-center">Tất cả sản phẩm</h4>
-                        <div className="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-12 col-xs-12 col-12">
+                    <div className="row align-items-center">
+                        <h4 className="py-3 col-10 text-xxl-start text-xl-start text-lg-start text-md-center text-sm-center text-xs-center text-center">Tất cả sản phẩm</h4>
+                        <div className="col-2">
                             <form action="" >
                                 <select name="sort" id="sort" className="form-select">
-                                    <option value="none">-- Sort by Products --</option>
-                                    <option value="priceLowest">-- Price (Low to High) --</option>
-                                    <option value="priceHighest">-- Price (High to Low) --</option>
-                                    <option value="nameAtoZ">-- Discount (High to Low) --</option>
-                                    <option value="nameZtoA">-- Name (A to Z) --</option>
+                                    <option value="none">Sort by</option>
+                                    <option value="priceLowest">Price (Low to High)</option>
+                                    <option value="priceHighest">Price (High to Low)</option>
+                                    <option value="nameAtoZ">Discount (High to Low)</option>
+                                    <option value="nameZtoA">Name (A to Z)</option>
                                 </select>
                             </form>
                         </div>
@@ -130,9 +130,11 @@ const Product= ()=>{
                             return(
                                 <div className="col-lg-3 col-ms-6 col-sm-6 col-6" key={product.id}>
                                 <div className="product-img">
+                                {product.discountPer ? 
                                     <div className="sale">
-                                        <span>{product.discountPer ? product.discountPer + '%'  : ''}</span>
+                                        <span>{product.discountPer + '%'}</span>
                                     </div>
+                                      : ''}
                                     <Link to={`detail/${product.slug}/${product.id}`}  className="change">
                                         <img src={`${IMG_URL}/${product.photo}`} alt={product.name} className="img-fluid"/>
                                         <ProductPhoto productId={product.id} IMG_URL={IMG_URL} />
@@ -140,7 +142,7 @@ const Product= ()=>{
                                 </div>
                                 <div className="product-title">
                                     <Link to={`detail/${product.slug}/${product.id}`}>{product.name}</Link>
-                                    <p>{new Intl.NumberFormat().format(product.price)}đ <del className="card-price-old">{product.dicount ? product.discount+'đ' : ''}</del></p>
+                                    <p>{new Intl.NumberFormat().format(product.price)}đ <del className="card-price-old">{product.discount ? product.discount+'đ' : ''}</del></p>
                                 </div>
                             </div>
                             )

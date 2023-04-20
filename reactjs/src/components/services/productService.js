@@ -10,6 +10,10 @@ const getAllProductsSearchPagination = (inputId,page,limit) => {
 const getAllProductPhoto = (productId) => {
     return axios.get(`${API_URL}/api/get-all-productphoto?productId=${productId}`)
 }
+
+const getAllProductsSearch = (search) =>{
+    return axios.get(`${API_URL}/api/get-product-by-search-name?search=${search}`)
+}
 const createNewProductService = (data) =>{
     console.log(data)
     return axios.post(`${API_URL}/api/create-new-product`,data);
@@ -56,6 +60,7 @@ const getDetailProductService = (data)=>{
 export {
     getAllProducts,
     getAllProductsSearchPagination,
+    getAllProductsSearch,
     createNewProductService,
     deleteProductService,
     updateProductService,
