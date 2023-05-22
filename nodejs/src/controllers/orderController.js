@@ -6,7 +6,22 @@ let handleAddOrder = async(req,res) => {
     let message = await orderService.addOrder(data)
     return res.status(200).json(message);
 }
-
+let handleGetAllOrders = async(req,res) => {
+    let id = req.query.id;
+    if(!id){
+        return res.status(200).json({
+            errCode: 1,
+            errMessage: 'Missing required parameters',
+            orders : []
+        })
+    }
+    let orders = await orderService.getAllOrders(id);
+    return res.status(200).json({
+        errCode: 0,
+        errMessage: 'OK',
+        orders 
+    })
+}
 let handleGetAllOrdersByUserId = async(req,res) => {
     let id = req.query.id;
     if(!id){
@@ -42,9 +57,9 @@ let handleGetDetailOrdersByOderId = async(req,res) => {
 }
 
 
-let handleUpdateAddress = async(req,res) => {
+let handleUpdateStatus = async(req,res) => {
     let data = req.body;
-    let message = await orderService.updateAddress(data);
+    let message = await orderService.updateStatus(data);
     return res.status(200).json(message)
 }
 
@@ -69,11 +84,13 @@ let handleDeleteAllCart = async(req,res) => {
     let message = await orderService.deleteAllCart(req.body.userId);
     return res.status(200).json(message);
 }
+
 module.exports = {
+    handleGetAllOrders: handleGetAllOrders,
     handleGetAllOrdersByUserId: handleGetAllOrdersByUserId,
     handleGetDetailOrdersByOderId:handleGetDetailOrdersByOderId,
     handleAddOrder: handleAddOrder,
-    handleUpdateAddress: handleUpdateAddress,
+    handleUpdateStatus: handleUpdateStatus,
     handleDeleteCart: handleDeleteCart,
-    handleDeleteAllCart:handleDeleteAllCart
+    handleDeleteAllCart:handleDeleteAllCart,
 }

@@ -16,7 +16,7 @@ module.exports = {
       },
     // tong cong
       grandtotal: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       message: {
         type: Sequelize.TEXT

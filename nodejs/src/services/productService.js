@@ -298,7 +298,6 @@ let getColorWithPagination = (searchColor,pageColor,limitColor)=>{
     })
 }
 let createNewColor = (data) => {
-    console.log(data)
     return new Promise((resolve,reject)=>{
         try { 
             db.Color.findOne({
@@ -349,38 +348,6 @@ let deleteColor = (ColorId) => {
             errMessage: `The Color is delete`
         });
     })
-}
-let updateColor = (data)=>{
-    return new Promise(async(resolve,reject)=>{
-        try {
-            if(!data.id){
-                resolve({
-                    errCode:2,
-                    errMessage:`Missing required parameters!`
-                })
-            }
-            let Color= await db.Color.findOne({
-                where: { id: data.id},
-                raw: false
-            })
-            if(Color){
-                Color.name= data.name,
-                Color.code= data.code,
-                await Color.save();
-                resolve({
-                    errCode: 0,
-                    message: `Update the Color succeeds!`
-                })
-            }else{
-                resolve({
-                    errCode: 1,
-                    errMessage: `Color's not found`
-                });
-            }
-        } catch (error) {
-            reject(error)
-        }
-    });
 }
 
 let createNewProductColor =(data)=>{
@@ -495,7 +462,49 @@ let deleteProduct = (ProductId) => {
     })
 }
 
-let updateProductData = (data)=>{
+
+let addFeedback = (data) => {
+    return new Promise(async(resolve,reject)=>{
+        try { 
+            await db.Feedback.create({
+                content: data.content,
+                userId: data.userId,
+                productId: data.productId
+            })
+            resolve({
+                errCode: 0,
+                message: ''
+            });
+       
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+let getAllFeedbacks = (id) =>{
+    return new Promise(async(resolve,reject)=>{
+        try {
+            let feedbacks='';
+            if(id === 'ALL'){
+                feedbacks = db.Feedback.findAll({
+                    raw: true,
+                });
+            }
+            if(id && id !== 'ALL'){
+                feedbacks = await db.Feedback.findOne({
+                    where: {id: id},
+                    raw : true ,
+                })
+            }
+            resolve(feedbacks)
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+
+let updateFeedback = (data)=>{
     return new Promise(async(resolve,reject)=>{
         try {
             if(!data.id){
@@ -504,23 +513,188 @@ let updateProductData = (data)=>{
                     errMessage:`Missing required parameters!`
                 })
             }
-            let Product= await db.Product.findOne({
+            let feedback= await db.Feedback.findOne({
                 where: { id: data.id},
                 raw: false
             })
-            if(Product){
-                Product.firstName= data.firstName,
-                Product.lastName= data.lastName,
-                Product.address=data.address
-                await Product.save();
+           
+            if(feedback){
+                
+                feedback.content= data.content,
+                
+                await feedback.save();
                 resolve({
                     errCode: 0,
-                    message: `Update the Product succeeds!`
+                    message: `Update the feedback succeeds!`
                 })
             }else{
                 resolve({
                     errCode: 1,
-                    errMessage: `Product's not found`
+                    errMessage: `Feedback's not found`
+                });
+            }
+        } catch (error) {
+            reject(error)
+        }
+    });
+}
+
+
+let deleteFeedback = (feedbackId) => {
+    return new Promise (async(resolve,reject)=>{
+        try {
+            let foundFeedback = await db.Feedback.findOne({
+                where: {id: feedbackId},
+                raw:true,
+            })
+            if(!foundFeedback){
+                resolve({
+                    errCode:2,
+                    errMessage: `The Feedback isn't exist`
+                })
+            }
+            await db.Feedback.destroy({
+                where: {id:feedbackId}
+            })
+            resolve({
+                errCode: 0,
+                errMessage: `The Feedback is delete`
+            });
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+let updateProductData = (data,file)=>{
+    return new Promise(async(resolve,reject)=>{
+        try {
+            if(!data.id){
+                resolve({
+                    errCode:2,
+                    errMessage:`Missing required parameters!`
+                })
+            }
+            
+            await db.Product.findOne({
+                where: { id: data.id},
+                raw: false
+            }).then(async(product)=>{
+                if(product){
+                    if(file){
+                        var photo = file.filename
+                    }else{
+                        var photo = data.photo
+                    }
+                    product.name= data.name,
+                    product.slug= data.slug,
+                    product.categoryId=data.categoryId
+                    product.price=data.price
+                    product.totalQty = data.totalQty
+                    product.discount=data.discount
+                    product.discountPer=data.discountPer
+                    product.photo=photo
+                    product.content=data.content
+                    product.newArrival=data.newArrival
+                    product.hidden=data.hidden
+                    await product.save();
+                    let detail = JSON.parse(data.detailProduct);
+                    console.log("DETAIL",detail);
+                    for(var i=0;i<detail.length;i++) {
+                        if(detail[i].id){
+                            let find = await db.DetailProduct.findOne({
+                                where: { id: detail[i].id},
+                                raw: false
+                            })   
+                            if(find){
+                                find.qtyProduct= detail[i].qtyProduct,
+                                find.colorId= detail[i].colorId,
+                                await find.save();
+                            }
+                        }
+                        else{
+                            console.log('detailxxxxx')
+                            await db.DetailProduct.create({
+                                productId:data.id,
+                                colorId:detail[i].colorId,
+                                qtyProduct:detail[i].qtyProduct,
+                            })
+                        }                         
+                    }
+                    resolve({
+                        errCode: 0,
+                        message: `Update product succeeds!`
+                    })
+                    
+                }else{
+                    resolve({
+                        errCode: 1,
+                        errMessage: `Product's not found`
+                    });
+                }
+            })
+            
+        } catch (error) {
+            reject(error)
+        }
+    });
+}
+// let updateDetailProduct = (data)=>{
+//     return new Promise(async(resolve,reject)=>{
+//         try {
+//             if(!data.productId){
+//                 resolve({
+//                     errCode:2,
+//                     errMessage:`Missing required parameters!`
+//                 })
+//             }
+//             let detail= await db.DetailProduct.findOne({
+//                 where: { productId: data.productId},
+//                 raw: false
+//             })
+//             if(detail){
+//                 detail.qtyProduct= data.qtyProduct,
+//                 detail.colorId= data.colorId,
+//                 await detail.save();
+//                 resolve({
+//                     errCode: 0,
+//                     message: `Update product succeeds!`
+//                 })
+//             }else{
+//                 resolve({
+//                     errCode: 1,
+//                     errMessage: `Color's not found`
+//                 });
+//             }
+//         } catch (error) {
+//             reject(error)
+//         }
+//     });
+// }
+let updateColor = (data)=>{
+    return new Promise(async(resolve,reject)=>{
+        try {
+            if(!data.id){
+                resolve({
+                    errCode:2,
+                    errMessage:`Missing required parameters!`
+                })
+            }
+            let color= await db.Color.findOne({
+                where: { id: data.id},
+                raw: false
+            })
+            if(color){
+                color.name= data.name,
+                color.code= data.code,
+                await color.save();
+                resolve({
+                    errCode: 0,
+                    message: `Update the Color succeeds!`
+                })
+            }else{
+                resolve({
+                    errCode: 1,
+                    errMessage: `Color's not found`
                 });
             }
         } catch (error) {
@@ -558,6 +732,11 @@ module.exports = {
     // C-R detail product
     getDetailProduct:getDetailProduct,
     createNewProductColor: createNewProductColor,
+
+    addFeedback: addFeedback,
+    getAllFeedbacks:getAllFeedbacks,
+    updateFeedback:updateFeedback,
+    deleteFeedback:deleteFeedback
 
 
 

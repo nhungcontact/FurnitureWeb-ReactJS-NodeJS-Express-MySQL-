@@ -26,14 +26,25 @@ let getAllCategories = (categoryId) =>{
 let createNewCategory = (data) => {
     return new Promise(async(resolve,reject)=>{
         try {  
-            await db.Category.create({
-                name: data.name,
-                description: data.description,
+            var findName = await db.Category.findAll({
+                name: data.name
             })
-            resolve({
-                errCode: 0,
-                message: 'OK'
-            });
+            if(!findName){
+                await db.Category.create({
+                    name: data.name,
+                    description: data.description,
+                })
+                resolve({
+                    errCode: 0,
+                    message: 'OK'
+                });
+            }else{
+                resolve({
+                    errCode: 1,
+                    message: 'Your category is already in used, Please try another category!'
+                });
+            }
+            
         } catch (error) {
             // console.error(error)
             reject(error)

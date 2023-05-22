@@ -12,6 +12,9 @@ module.exports = {
       content: {
         type: Sequelize.TEXT
       },
+      status: {
+        type: Sequelize.BOOLEAN
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -24,6 +27,15 @@ module.exports = {
         type: Sequelize.INTEGER,
         references:{
             model:'blogs',
+            key:'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete:'CASCADE'
+      },
+      userId: {
+        type: Sequelize.INTEGER,
+        references:{
+            model:'users',
             key:'id'
         },
         onUpdate: 'CASCADE',

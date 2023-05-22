@@ -1,9 +1,32 @@
 import db from "../models/index";
-const { Op } = require("sequelize");
+
+
+let getAllAddress = (id) =>{
+    return new Promise(async(resolve,reject)=>{
+        try {
+            let address='';
+            if(id === 'ALL'){
+                address = db.Address.findAll({
+                    raw: true,
+                });
+            }
+            if(id && id !== 'ALL'){
+                address = await db.Address.findOne({
+                    where: {id: id},
+                    raw : true ,
+                })
+            }
+            resolve(address)
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
 
 let createAddress = (data) => {
     return new Promise(async(resolve,reject)=>{
         try {  
+            
             await db.Address.create({
                 fullName:data.data.fullName,
                 phoneNumber: data.data.phoneNumber,
@@ -23,7 +46,6 @@ let createAddress = (data) => {
         }
     })
 }
-
 let getAllAddressByUserId = (userId) =>{
     return new Promise(async(resolve,reject)=>{
         try {
@@ -85,6 +107,7 @@ let updateAddress = (data)=>{
                 },
                 raw: false
             })
+            console.log(address);
             if(address){
                 address.fullName= data.fullName,
                 address.phoneNumber= data.phoneNumber,
@@ -112,6 +135,7 @@ let updateAddress = (data)=>{
 module.exports = {
 
     // CRUD category
+    getAllAddress: getAllAddress,
     getAllAddressByUserId: getAllAddressByUserId,
 
     createAddress: createAddress,

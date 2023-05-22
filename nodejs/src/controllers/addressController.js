@@ -6,6 +6,22 @@ let handleCreateAddress = async(req,res) => {
     let message = await addressService.createAddress(data,userId)
     return res.status(200).json(message);
 }
+let handleGetAllAddress = async(req,res) => {
+    let id = req.query.id;
+    if(!id){
+        return res.status(200).json({
+            errCode: 1,
+            errMessage: 'Missing required parameters',
+            address : []
+        })
+    }
+    let address = await addressService.getAllAddress(id);
+    return res.status(200).json({
+        errCode: 0,
+        errMessage: 'OK',
+        address 
+    })
+}
 
 let handleGetAllAddressByUserId = async(req,res) => {
     let id = req.query.id;
@@ -54,6 +70,7 @@ let handleDeleteAllCart = async(req,res) => {
     return res.status(200).json(message);
 }
 module.exports = {
+    handleGetAllAddress: handleGetAllAddress,
     handleGetAllAddressByUserId: handleGetAllAddressByUserId,
     handleCreateAddress: handleCreateAddress,
     handleUpdateAddress: handleUpdateAddress,

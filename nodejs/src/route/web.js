@@ -10,6 +10,7 @@ import multer from "multer";
 // import path from 'path';
 
 let router = express.Router();
+
 const IMAGE_PATH = './assets/images';
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -24,6 +25,8 @@ var upload = multer({ storage: storage })
 
 let initWebRoutes = (app) => {
 
+   
+
     router.post('/api/login',userController.handleLogin);
     router.post('/api/register',userController.handleRegister);
 
@@ -34,8 +37,8 @@ let initWebRoutes = (app) => {
     router.get('/api/get-user-by-email',userController.handleGetUserByEmail);
     // router.post('/api/auth/logout',userController.logout);
     router.get(
-        "/api/test/user",
-        userController.verifyToken
+        "/api/test/admin",
+        userController.handleIsAdmin
       );
    
     router.get('/api/get-all-categories', categoryController.handleGetAllCategories);
@@ -51,9 +54,16 @@ let initWebRoutes = (app) => {
     router.get('/api/get-all-product-by-category', productController.handleGetProductByCategory);
     router.get('/api/get-all-productphoto', productController.handleGetAllProductPhoto);
     router.get('/api/get-product-by-search-name', productController.handleGetSearchProducts);
-    // router.put('/api/edit-product',productController.handleEditproduct);
+    router.put('/api/edit-product',upload.single('photo'),productController.handleEditProduct);
     router.delete('/api/delete-product',productController.handleDeleteProduct);
-    
+
+
+    router.post('/api/add-feedback',productController.handleAddFeedback);
+    router.get('/api/get-all-feedbacks', productController.handleGetAllFeedbacks);
+    router.put('/api/update-feedback', productController.handleUpdateFeedback);
+    router.delete('/api/delete-feedback',productController.handleDeleteFeedback);
+
+
     router.get('/api/get-all-colors', productController.handleGetAllColors);
     router.post('/api/create-new-color',productController.handleCreateNewColor);
     router.put('/api/update-color',productController.handleEditColor);
@@ -69,17 +79,32 @@ let initWebRoutes = (app) => {
     router.delete('/api/delete-cart',cartController.handleDeleteCart);
     router.delete('/api/delete-all-cart',cartController.handleDeleteAllCart);
 
+    router.get('/api/get-address', addressController.handleGetAllAddress);
     router.get('/api/get-address-by-user', addressController.handleGetAllAddressByUserId);
     router.post('/api/create-address', addressController.handleCreateAddress);
     router.put('/api/update-address',addressController.handleUpdateAddress);
       
+    router.get('/api/get-orders', orderController.handleGetAllOrders);
     router.get('/api/get-orders-by-user', orderController.handleGetAllOrdersByUserId);
     router.get('/api/get-detailorders-by-order', orderController.handleGetDetailOrdersByOderId);
     router.post('/api/add-order', orderController.handleAddOrder);
+    router.put('/api/update-order',orderController.handleUpdateStatus);
+
     // router.put('/api/update-address',addressController.handleUpdateAddress);
 
     router.get('/api/get-all-blogs', blogController.handleGetAllBlogs);
     router.post('/api/create-new-blog', upload.single('photo'),blogController.handleCreateBlog);
+    router.put('/api/update-blog', upload.single('photo'),blogController.handleUpdateBlog);
+    router.post('/api/add-comment', blogController.handleAddComment);
+    router.get('/api/get-all-comments', blogController.handleGetAllComments);
+    router.put('/api/update-comment', blogController.handleUpdateComment);
+    router.put('/api/update-comment-user', blogController.handleUpdateCommentUser);
+    router.delete('/api/delete-blog',blogController.handleDeleteBlog);
+    router.delete('/api/delete-comment',blogController.handleDeleteComment);
+
+
+
+
 
 
     return app.use("/", router);

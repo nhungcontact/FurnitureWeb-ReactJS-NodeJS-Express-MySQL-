@@ -114,11 +114,9 @@ let handleCreateNewProduct = async(req,res) => {
 }
 
 let handleEditProduct = async(req,res) => {
-    let data = req.body;
-    let message = await productService.updateProductData(data);
+    let message = await productService.updateProductData(req.body,req.file);
     return res.status(200).json(message)
 }
-
 let handleDeleteProduct = async(req,res) => {
     if(!req.body.id){
         return res.status(200).json({
@@ -172,8 +170,44 @@ let handleCreateProductColor = async(req,res) => {
     let message = await productService.createNewProductColor(req.body);
     return res.status(200).json(message);
 }
+let handleAddFeedback = async(req,res)=>{
+    let message = await productService.addFeedback(req.body);
+    return res.status(200).json(message);
+
+}
+let handleGetAllFeedbacks = async(req,res) => {
+    let id = req.query.id;
+    if(!id){
+        return res.status(200).json({
+            errCode: 1,
+            errMessage: 'Missing required parameters',
+            feedbacks : []
+        })
+    }
+    let feedbacks = await productService.getAllFeedbacks(id);
+    return res.status(200).json({
+        errCode: 0,
+        errMessage: 'OK',
+        feedbacks 
+    })
+}
 
 
+let handleUpdateFeedback = async(req,res) => {
+    let message = await productService.updateFeedback(req.body);
+    return res.status(200).json(message);
+}
+
+let handleDeleteFeedback = async(req,res) => {
+    if(!req.body.feedbackId){
+        return res.status(200).json({
+            errCode : 1,
+            errMessage: 'Missing inputs parameter!',
+        })
+    }
+    let message = await productService.deleteFeedback(req.body.feedbackId);
+    return res.status(200).json(message);
+}
 module.exports = {
     handleGetAllProducts: handleGetAllProducts,
     handleGetSearchProducts:handleGetSearchProducts,
@@ -192,7 +226,14 @@ module.exports = {
     handleGetAllProductsSearchPagination:handleGetAllProductsSearchPagination,
     handleGetAllColors: handleGetAllColors,
     handleGetAllProductPhoto: handleGetAllProductPhoto,
-    handleGetProductByCategory:handleGetProductByCategory
+    handleGetProductByCategory:handleGetProductByCategory,
+
+    handleAddFeedback: handleAddFeedback,
+    handleGetAllFeedbacks:handleGetAllFeedbacks,
+    handleUpdateFeedback:handleUpdateFeedback,
+    handleDeleteFeedback:handleDeleteFeedback
+
+
 }
 
 // exports.handleLogin = (req,res) => {

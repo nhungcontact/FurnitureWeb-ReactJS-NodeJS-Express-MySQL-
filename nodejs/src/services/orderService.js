@@ -1,5 +1,5 @@
 import db from "../models/index";
-const { Op } = require("sequelize");
+// const { Op } = require("sequelize");
 
 
 let addOrder = (data) => {
@@ -10,7 +10,7 @@ let addOrder = (data) => {
                 number:data.number,
                 grandtotal:data.grandTotal,
                 message: data.message,
-                userId:data.userId,
+                userId: data.userId,
                 addressId: data.addressId,
             }).then(async(order)=>{
                 if(order){
@@ -22,12 +22,20 @@ let addOrder = (data) => {
                                 price:data.list[i].price,
                                 orderId:order.id,
                                 productId:data.list[i].productId,
-                            }).then(detail=>{
+                            }).then( async(detail) =>{
                                 if(detail){
-                                    resolve({
-                                        errCode: 0,
-                                        message: 'OK'
-                                    });  
+                                    var update = await updateQtyProduct(data.list[i].productId, data.list[i].quantity);
+                                    if(update){
+                                        resolve({
+                                            errCode: 0,
+                                            message: 'OK'
+                                        });  
+                                    }else{
+                                        resolve({
+                                            errCode: 1,
+                                            message: 'fail'
+                                        });  
+                                    }
                                 }
                             })
                         }
@@ -38,6 +46,48 @@ let addOrder = (data) => {
            
         } catch (error) {
             console.error(error)
+            reject(error)
+        }
+    })
+}
+
+
+let updateQtyProduct = (productId,qty)=>{
+    return new Promise(async(resolve, reject) => {
+        try {
+            var product = await db.Product.findOne({
+                where:{id:productId},
+                raw: false
+            })
+            if(product){
+                product.totalQty= product.totalQty - qty
+                await product.save();
+                resolve(true);
+            }else{
+                resolve(false);
+            }
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+let getAllOrders = (id) =>{
+    return new Promise(async(resolve,reject)=>{
+        try {
+            let order='';
+            if(id === 'ALL'){
+                order = db.Order.findAll({
+                    raw: true,
+                });
+            }
+            if(id && id !== 'ALL'){
+                order = await db.Order.findOne({
+                    where: {id: id},
+                    raw : true ,
+                })
+            }
+            resolve(order)
+        } catch (error) {
             reject(error)
         }
     })
@@ -83,87 +133,25 @@ let getDetailOrderByOrderId = (orderId) =>{
         }
     })
 }
-// req.body
-let getOrdersWithPagination = (id,pageOrder,limitOrder)=>{
+
+let updateStatus = (data)=>{
+    console.log(data);
     return new Promise(async(resolve, reject) => {
         try {
-            const page = parseInt(pageOrder) || 0;
-            const limit = parseInt(limitOrder) || 10;
-            const search = searchOrder || '';
-            const offset = limit * page;
-            const totalRows = await db.Order.count({
-                    where: { custId: id },
-                    
-            })
-            const totalPage = Math.ceil(totalRows / limit);
-            const result = await db.Order.findAll({
-                where: { custId: id },
-                include: [{ model: db.Address, include: [{ model: db.Cart }] }],
-                raw: true,
-                offset: offset,
-                limit: limit,
-                order: [['createdAt', 'DESC']]
-            })
-            // resolve(result)
-            resolve({
-                Orders: result,
-                page: page,
-                limit:limit,
-                totalRows: totalRows,
-                totalPage:totalPage
-            })
-        } catch (error) {
-            reject(error)
-        }
-    })
-}
-// req.body
-let getOrdersByStatus=(orderName)=>{
-    return new Promise( async(resolve,reject)=>{
-        try {
-            let orders = await db.Order.findAll({
-                attributes: ['status', [Sequelize.fn('COUNT', Sequelize.col('status')), 'total']],
-                group: ['status']
-            })
-            if(orders){
-                resolve(orders)
-            }else{
-                resolve('')
-            }
-        } catch (error) {
-            reject(error);
-        }
-    })
-}
-
-
-let getOrdersByCount=()=>{
-    return new Promise( async(resolve,reject)=>{
-        try {
-            let orders = await db.Blog.findAll({
-                where: { status: req.body.status },
-                order: [['createdAt', 'DESC']],
-                include: [{ model: db.Address, include: [{ model: db.Cart }] }],
-            })
-            if(orders){
-                resolve(orders)
-            }else{
-                resolve('')
-            }
-        } catch (error) {
-            reject(error);
-        }
-    })
-}
-
-
-let updateStatus = (id,status,deliveryDate)=>{
-    return new Promise(async(resolve, reject) => {
-        try {
-            let order = db.Order.findOne({where:{id:id}});
+            let order = await db.Order.findOne({
+                where:{id:data.id},
+                raw: false
+            });
+            console.log(order);
             if(order){
-                order.status= status,
-                order.deliveryDate= deliveryDate ? deliveryDate : order.deliveryDate,
+                order.number = order.number,
+                order.grandtotal = order.grandtotal,
+                order.message = order.message,
+                order.status= data.status,
+                order.deliveryDate= data.deliveryDate,
+                order.userId = order.userId,
+                order.addressId = order.addressId
+                
                 await order.save();
                 // db.Order.update({
                 //     status: status,
@@ -173,74 +161,23 @@ let updateStatus = (id,status,deliveryDate)=>{
                     errCode: 0,
                     message: `Update the status succeeds!`
                 })
-            }
-        } catch (error) {
-            reject(error)
-        }
-    })
-}
-let deleteBlog = (blogId) => {
-    return new Promise (async(resolve,reject)=>{
-        let foundBlog = await db.Blog.findOne({
-            where: {id: blogId},
-            raw:true,
-        })
-        if(!foundBlog){
-            resolve({
-                errCode:2,
-                errMessage: `The Blog isn't exist`
-            })
-        }
-        await db.Blog.destroy({
-            where: {id:blogId}
-        })
-        resolve({
-            errCode: 0,
-            errMessage: `The Blog is delete`
-        });
-    })
-}
-
-let updateBlogData = (data)=>{
-    return new Promise(async(resolve,reject)=>{
-        try {
-            if(!data.id){
-                resolve({
-                    errCode:2,
-                    errMessage:`Missing required parameters!`
-                })
-            }
-            let blog= await db.Blog.findOne({
-                where: { id: data.id},
-                raw: false
-            })
-            if(blog){
-                blog.name= data.name,
-                blog.image= data.image,
-                blog.writer=data.writer,
-                blog.slug=data.slug,
-                blog.content=data.content,
-                blog.hidden=data.hidden,
-                blog.new=data.new
-                await blog.save();
-                resolve({
-                    errCode: 0,
-                    message: `Update the blog succeeds!`
-                })
             }else{
                 resolve({
                     errCode: 1,
-                    errMessage: `Blog's not found`
-                });
+                    message: `Order not found!`
+                })
             }
         } catch (error) {
             reject(error)
         }
-    });
+    })
 }
 
 module.exports = {
     addOrder:addOrder,
+    getAllOrders:getAllOrders,
     getAllOrdersByUserId:getAllOrdersByUserId,
-    getDetailOrderByOrderId:getDetailOrderByOrderId
+    getDetailOrderByOrderId:getDetailOrderByOrderId,
+    updateStatus:updateStatus,
+    updateQtyProduct: updateQtyProduct,
 }
