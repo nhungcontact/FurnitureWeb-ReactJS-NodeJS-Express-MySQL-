@@ -26,8 +26,9 @@ const deleteProductService = (productId) =>{
     });
 }
 const updateProductService = (inputData) =>{
-    return axios.put(`${API_URL}/api/edit-user`,inputData)
+    return axios.put(`${API_URL}/api/edit-product`,inputData)
 }
+
 const getAllColors = (inputId) => {
     return axios.get(`${API_URL}/api/get-all-colors?id=${inputId}`)
 }
@@ -42,7 +43,7 @@ const deleteColorService = (colorId) =>{
     });
 }
 const editColorService = (inputData) =>{
-    return axios.put(`${API_URL}/api/edit-color`,inputData)
+    return axios.put(`${API_URL}/api/update-color`,inputData)
 }
 
 const createNewProductColorService = (data) =>{
@@ -57,6 +58,25 @@ const getDetailProductService = (data)=>{
     console.log(data)
     return axios.get(`${API_URL}/api/get-detailproduct?id=${data}`)
 }
+
+const addFeedback = (data) =>{
+    console.log(data)
+    return axios.post(`${API_URL}/api/add-feedback`,data);
+}
+const getAllFeedbacks = (inputId) => {
+    return axios.get(`${API_URL}/api/get-all-feedbacks?id=${inputId}`);
+}
+const updateFeedback = (data) =>{
+    return axios.put(`${API_URL}/api/update-feedback`,data);
+}
+const deleteFeedback = (feedbackId) =>{
+    return axios.delete(`${API_URL}/api/delete-feedback`,{
+        data:{
+            feedbackId:feedbackId
+        }
+    });
+}
+
 export {
     getAllProducts,
     getAllProductsSearchPagination,
@@ -71,5 +91,9 @@ export {
     createNewProductColorService,
     createNewProductPhotoService,
     getDetailProductService,
-    getAllProductPhoto
+    getAllProductPhoto,
+    addFeedback,
+    getAllFeedbacks,
+    updateFeedback,
+    deleteFeedback
 }

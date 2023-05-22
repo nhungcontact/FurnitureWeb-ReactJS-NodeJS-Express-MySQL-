@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
 import { getDetailOrdersByOrderId } from "../../../../services/orderService";
+import ProductOrder from "./ProductOrder";
 // import { IMG_URL } from "../../../../config/imgUrl";
 const DetailOrder = (props)=>{
     const [listDetail,setListDetail]=useState([]);
-    const [orderId]=useState(props.id);
+    const orderId=props.id;
+    
     useEffect(()=>{
-        getDetailOrdersFromReact()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[orderId]);
-
-    const getDetailOrdersFromReact = async()=>{
+        const getDetailOrdersFromReact = async()=>{
         let list = await getDetailOrdersByOrderId(orderId);
         console.log(list);
         if(list && list.data.errCode === 0){
@@ -17,22 +15,25 @@ const DetailOrder = (props)=>{
         }
 
     }
+        getDetailOrdersFromReact()
+    },[orderId]);
+
+    
     return(
-        <div className='row'>
+        <div className='row list_detail_order'>
             {listDetail && listDetail.map((item,index)=>(
             <div className="d-flex justify-content-between align-items-center mb-4 col-12"key={item.id}>
                 <div className='d-flex justify-content-between'>
+                
                     {/* <img src={`${IMG_URL}/${item.products.photo}`} alt="fdsfds" className='img-fluid' style={{width:"110px"}} /> */}
                     <div className='ms-2'>
-                        <b>tuidsasadasd</b>
-                        <p className="m-0">{new Intl.NumberFormat().format(item.price)}đ</p>
-                        <p className="m-0">Color: <i style={{color:item.color}} class="fa-solid fa-circle"></i></p>
-                        <p className="text-muted m-0">{item.quantity} items</p>
+                        <ProductOrder idPro = {item.productId} color={item.color}/>
                     </div>
                 </div>
-                <div className="">
-                    <div>{item.price}</div>
-                    <del className='card-price-old'>1,234,455</del>
+                <div className="text-end">
+                    <b>{new Intl.NumberFormat().format(item.price)}đ</b>
+                    <p className="text-muted m-0">Qty: {item.quantity}</p>
+                    {/* <del className='card-price-old'>1,234,455</del> */}
                 </div>
             </div>
             ))}

@@ -31,7 +31,7 @@ const ListProduct =()=> {
     const [perPage]=useState(10);
     const [currentPage,setCurrentPage]=useState(0);
     const [pageCount,setPageCount]=useState(0);
-    
+    const [productData,setProductData]=useState([]);
     const [isOpenModalDetailProduct,setIsOpenModalDetailProduct]=useState(false);
 
     // const handleShowDetail = ()=>{
@@ -48,13 +48,16 @@ const ListProduct =()=> {
         setIsLoaded(false);
         const response = await getAllProducts('ALL');
         if(response && response.data.errCode === 0){
-            var tdata = response.data.products;
-            var slice = tdata.slice(offset, offset + perPage)
+            setProductData(response.data.products)
+            pagination(response.data.products);
+        }
+    }
+    const pagination = (tdata)=>{
+        var slice = tdata.slice(offset, offset + perPage)
             setPageCount(Math.ceil(tdata.length / perPage));
             // setPagProduct(tdata);
             setArrProducts(slice);
             setIsLoaded(true);
-        }
     }
     const handlePageClick = (e) => {
         const selectedPage = e.selected;
@@ -145,29 +148,25 @@ const ListProduct =()=> {
         setIsOpenModalDetailProduct(!isOpenModalDetailProduct);
 
     }
-    // handleSubmit = async (event) => {
-    //     event.preventDefault();
-    //     this.setState({ loading: false })
-    //     let list = await GetProductDetails.getProductById(this.state.selectedProduct.value);
-    //     if (list) {
-    //         this.setState({ getList: list.data, isloaded: true })
-    //     }
+    const handleSelectCategory=async(categoryId)=>{
+        if(categoryId){
+            const search = productData.filter(item => (item.categoryId === categoryId));
+            setArrProducts(search);
+            pagination(search);
+        }
+    }
+    const [filterParam, setFilterParam] = useState('');
 
-    // }
-    // const doEditProduct = async(user) => {
-    //     try {
-    //         let res = await editProductService(user);
-    //         console.log(res);
-    //         if(res && res.data.errCode===0){
-    //             setIsOpenModalEditProduct(false)
-    //             await getAllProductsFromReact()
-    //         }else{
-    //             alert(res.data.errMessage)
-    //         }
-    //     } catch (error) {
-    //         console.log(error)
-    //     }
-    // }
+    const handleFilter = async(e)=>{
+        setFilterParam(e.target.value);
+        if(e.target.value===''){
+            setArrProducts(productData);
+        }else{
+            const search = productData.filter(item => (item.name.toLowerCase().includes(e.target.value.toLowerCase())));
+            setArrProducts(search);
+        }
+    }
+   
     
     return (
         <div className='list'>
@@ -175,9 +174,6 @@ const ListProduct =()=> {
                 <div className="col-lg-5 col-md-9 col-lg-6">
                     <h3 className="mt-30 page-title">Product</h3>
                 </div>
-                {/* <div className="col-lg-5 col-md-3 col-lg-6 back-btn">
-                    <Button variant="contained" onClick={(e) => this.handleBack()}><i className="fas fa-arrow-left" /> Back</Button>
-                </div> */}
             </div>
             <ol className="breadcrumb mb-30">
                 <li className="breadcrumb-item"><a href="index.html">Dashboard</a></li>
@@ -193,18 +189,20 @@ const ListProduct =()=> {
             <div className='form-container mt-4'>
                 <h4 className='text-center form-title'>List Of Products</h4>
                 <div className='form-body'>
+                    
                     <div className='d-flex justify-content-between align-items-center'>
-                        <SelectCategory />
+                        <div className='d-flex align-items-center'>
+                            <div className='d-flex align-items-center'>
+                            <b className='me-2'>Category: </b>
+                            <SelectCategory onSelected={handleSelectCategory}/>
+                            </div>
+                            <div class="search ms-3" htmlFor="search">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input className="form-control" id="search" type="text" value={filterParam}
+                                    onChange={(e) => handleFilter(e)} placeholder="Search name..." />
+                            </div>
+                        </div>
                         <div className='d-flex'>
-                            {/* <form className="d-flex" onSubmit={searchData}>
-                                <input
-                                    className='form-control'
-                                    type="text"
-                                    placeholder="Search...."
-                                    onChange={e=>setSearchInput(e.target.value)}
-                                    value={searchInput} />
-                                <button type='submit' style={{whiteSpace:"nowrap"}} className='btn btn-primary'>Search</button>
-                            </form> */}
                             <div className='mx-2'>
                                 <a href='/admin/add-product'><button className='btn add-product'><i class="fa-solid fa-plus me-2"></i>Add</button></a>
                             </div>
@@ -231,8 +229,7 @@ const ListProduct =()=> {
                             {isloaded ? 
                                 arrProducts && arrProducts.map((product,index)=>{
                                     return(
-                                       <>
-                                       <tr key={product.id}>
+                                        <tr key={product.id}>
                                             <td className='text-center align-middle'>{index+1}</td>
                                             {/* <td className='text-center align-middle'>{product.id}</td> */}
                                             <td className='text-center align-middle'>{product.name}</td>
@@ -272,8 +269,6 @@ const ListProduct =()=> {
                                                
                                             </td>
                                         </tr>
-                                        
-                                       </>
                                         
                                     )
                                 })

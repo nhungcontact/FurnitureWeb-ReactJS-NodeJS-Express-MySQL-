@@ -12,7 +12,8 @@ import { getAllUsers} from '../../../services/userService';
 const ListUser = () => {
 
     const [arrUsers,setArrUsers]=useState([]);
-     
+    const [userData,setUserData]=useState([]);
+
     // const [pagColor,setPagColor]=useState([]);
     const [isloaded,setIsLoaded]=useState(false);
     const [offset, setOffset] = useState(0);
@@ -29,13 +30,17 @@ const ListUser = () => {
         setIsLoaded(false);
         const response = await getAllUsers('ALL');
         if(response && response.data.errCode === 0){
-            var tdata = response.data.users;
-            var slice = tdata.slice(offset, offset + perPage)
-            setPageCount(Math.ceil(tdata.length / perPage));
-            // setPagColor(tdata);
-            setArrUsers(slice);
-            setIsLoaded(true);
+           setUserData(response.data.users);
+           pagination(response.data.users);
         }
+    }
+
+    const pagination = (tdata)=>{
+        var slice = tdata.slice(offset, offset + perPage)
+        setPageCount(Math.ceil(tdata.length / perPage));
+        // setPagColor(tdata);
+        setArrUsers(slice);
+        setIsLoaded(true);
     }
     const handlePageClick = (e) => {
         const selectedPage = e.selected;
@@ -44,7 +49,15 @@ const ListUser = () => {
         setOffset(offset);
         // loadMoreData();
     };
-
+   
+    
+    // const data = {
+    //     const filter = arrUsers.filter((item) =>
+    //     item.name.toLowerCase().includes(search.toLowerCase())
+    //     ),
+    //   };
+    //   console.log(data);
+    
     // const handleDeleteUser= async(User)=>{
     //     console.log('Delete!',User)
     //     try {
@@ -59,6 +72,17 @@ const ListUser = () => {
     //     }
     // }
 
+    const [filterParam, setFilterParam] = useState('');
+
+    const handleFilter = async(e)=>{
+        setFilterParam(e.target.value);
+        if(e.target.value===''){
+            setArrUsers(userData)
+        }else{
+            const search = userData.filter(item => (item.username.toLowerCase().includes(e.target.value.toLowerCase())|| item.email.toLowerCase().includes(e.target.value.toLowerCase()) || item.phoneNumber.toLowerCase().includes(e.target.value.toLowerCase())));
+            setArrUsers(search);
+        }
+    }
 
     return (
         <div className='list'>
@@ -77,28 +101,19 @@ const ListUser = () => {
             <div className='form-container'>
                 <h4 className='text-center form-title'>List Of Users</h4>
                 <div className='form-body'>
-                    <div className='d-flex justify-content-end'>
-
-                        {/* <form className="d-flex" onSubmit={searchData}>
-                            <input
-                                className='form-control'
-                                type="text"
-                                placeholder="Search...."
-                                onChange={e=>setSearchInput(e.target.value)}
-                                value={searchInput} 
-
-                                />
-                            <button type='submit' style={{whiteSpace:"nowrap"}} className='btn btn-primary'>Search</button>
-                        </form> */}
+                    <div class="search" htmlFor="search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input className="form-control" id="search" type="text" value={filterParam}
+                            onChange={(e) => handleFilter(e)} placeholder="Search username, email and phone number..." />
                     </div>
+                   
                     <div className='table-responsive mt-5'>
                         <table className="table table-hover">
                             <thead>
                                 <tr>
                                     <th className='text-center align-middle form-title'>#</th>
                                     <th className='text-center align-middle form-title'>Id</th>
-                                    <th className='text-center align-middle form-title'>First Name</th>
-                                    <th className='text-center align-middle form-title'>Last Name</th>
+                                    <th className='text-center align-middle form-title'>Username</th>
                                     <th className='text-center align-middle form-title'>Email</th>
                                     <th className='text-center align-middle form-title'>Phone Number</th>
                                 </tr>
@@ -109,8 +124,7 @@ const ListUser = () => {
                                         <tr key={item.id}>
                                             <td className='text-center align-middle'>{index+1}</td>
                                             <td className='text-center align-middle'>{item.id}</td>
-                                            <td className='text-center align-middle'>{item.firstName}</td>
-                                            <td className='text-center align-middle'>{item.lastName}</td>
+                                            <td className='text-center align-middle'>{item.username}</td>
                                             <td className='text-center align-middle'>{item.email}</td>
                                             <td className='text-center align-middle'>{item.phoneNumber}</td>
                                             

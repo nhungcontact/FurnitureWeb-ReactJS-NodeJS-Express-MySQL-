@@ -248,3 +248,69 @@ label.form-label {
 /* p{
     color:rgb(188, 72, 36);
 } */
+
+
+/* search */
+.search {
+    position: relative;
+    color: #777;
+    font-size: 16px;
+  }
+  
+  .search {display: inline-block;}
+  
+  .search input {
+    width: 450px;
+    height: 38px;
+/*   
+    background: #fcfcfc;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    box-shadow: 0 0 3px #ccc, 0 10px 15px #ebebeb inset; */
+  }
+  
+  .search input { text-indent: 32px;font-size: 15px;}
+  .search .fa-magnifying-glass { 
+    position: absolute;
+    top: 10px;
+    left: 10px;
+  }
+  
+  .search .fa-magnifying-glass {left: 10px; right: auto;}
+
+
+  .detail-order .card {
+    box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
+}
+.detail-order .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 0 solid rgba(0,0,0,.125);
+    border-radius: 1rem;
+}
+.detail-order .text-reset {
+    --bs-text-opacity: 1;
+    color: inherit!important;
+}
+.detail-order a {
+    color: #5465ff;
+    text-decoration: none;
+}
+
+
+.card {
+    border: none;
+    margin-bottom: 24px;
+    -webkit-box-shadow: 0 0 13px 0 rgba(236,236,241,.44);
+    box-shadow: 0 0 13px 0 rgba(236,236,241,.44);
+}
+
+.avatar-xs {
+    height: 2.3rem;
+    width: 2.3rem;
+}

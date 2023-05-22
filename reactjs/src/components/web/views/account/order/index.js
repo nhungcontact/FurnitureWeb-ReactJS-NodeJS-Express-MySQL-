@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 import { getUserByEmail } from '../../../../services/userService';
 import { getAllOrdersByUserId } from '../../../../services/orderService';
 import DetailOrder from './DetailOrder';
+import AddressOrder from './AddressOrder';
+import moment from 'moment';
 const Order = ()=>{
     const[listOrder,setListOrder]=useState([]);
     useEffect(()=>{
@@ -13,7 +15,7 @@ const Order = ()=>{
     },[]);
     
     const getOrdersFromReact = async()=>{
-        let email = sessionStorage.getItem('email')
+        let email = localStorage.getItem('email')
         if (email) {
             let data= await getUserByEmail(email);
             if (data && data.data.errCode === 0) {
@@ -47,7 +49,6 @@ const Order = ()=>{
                                             <div className={"text-end " + (item.status === 'processing' ? 'text-primary' : (item.status==='shipping' ? 'text-primary' : (item.status === 'delivered' ? 'text-success':'text-danger')))}>
                                                 <i class={"fa-solid " + (item.status === 'processing' ? 'fa-box-open' : (item.status==='shipping' ? 'fa-truck-fast' : (item.status === 'delivered' ? 'fa-box':'fa-triangle-exclamation')))}></i> {item.status}
                                                 <br />
-                                                <span className="text-muted">{item.deliveryDate ? item.deliveryDate :''}</span>
                                             </div>
                                         </div>
                                     
@@ -61,8 +62,20 @@ const Order = ()=>{
                         {listOrder && listOrder.map((item,index)=>(
                             <>
                             <Tab.Pane eventKey={index+1} key={item.id}>
-                            <div className="title pb-3">Order #{item.number} <span className='text-muted' style={{fontWeight:"300"}}>({listOrder.length})</span></div>
+                            <h5 className="title">Order #{item.number} 
+                                <span className='text-muted mb-1' style={{fontWeight:"300"}}>({listOrder.length})</span>
+                                
+                            </h5>
+                            <p className='m-0' style={{fontWeight:"400",color:"#666"}}><span style={{color:"#888"}}>Order date:</span> {moment(item.createdAt).format("YYYY/MM/DD hh:mm")}</p>
+                            <hr />
+                            
                                 <DetailOrder id={item.id} />
+                                <hr />
+                                <div className="title pb-3">Delivery</div>
+                                <AddressOrder idAdd = {item.addressId} />
+                                <b className="title pb-3">Delivery Date<span className='text-muted'>(expected)</span>: </b>
+                                <span className="text-muted">{item.deliveryDate ? moment(item.deliveryDate).format("YYYY/MM/DD") :''} </span>
+
                             </Tab.Pane>
                             </>
                         ))}

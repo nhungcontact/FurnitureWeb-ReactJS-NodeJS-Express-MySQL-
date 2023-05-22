@@ -3,13 +3,15 @@ import { getAllProducts } from "../../../services/productService";
 import {IMG_URL} from '../../../config/imgUrl';
 import { ThreeDots } from "react-loader-spinner";
 import { Link } from "react-router-dom";
-import Color from "./Color";
 import ProductPhoto from "./ProductPhoto";
 import Pagination from "../../../pagination";
-import Category from "./Category";
+// import { getAllCategories } from "../../../services/categoryService";
 
 const Product= ()=>{
     const [arrProducts,setArrProducts]=useState([]);
+    // const [color,setColor]=useState([]);
+    // const [arrCategory,setArrCategory]=useState([]);
+
     // const [searchInput, setSearchInput] = useState('');
     // const [keyword,setKeyword]=useState('');
     // const [pagProduct,setPagProduct]=useState([]);
@@ -18,6 +20,26 @@ const Product= ()=>{
     const [perPage]=useState(20);
     const [currentPage,setCurrentPage]=useState(0);
     const [pageCount,setPageCount]=useState(0);
+
+    // useEffect(()=>{
+    //     const getAllCategoriesFromReact = async()=>{
+    //         const list = await getAllCategories('ALL');
+    //         if(list && list.data.errCode === 0){
+    //             setArrCategory(list.data.categories);
+    //         }
+    //     }
+    //     getAllCategoriesFromReact();
+    // },[]);
+    // useEffect(()=>{
+    //     const getAllColorsFromReact = async()=>{
+    //         let data = await getAllColors('ALL');
+            
+    //         if(data && data.data.errCode === 0){
+    //             setColor(data.data.colors);
+    //         }
+    //     }
+    //     getAllColorsFromReact();
+    // },[])
 
     useEffect(()=>{
         getAllProductsFromReact();
@@ -55,13 +77,42 @@ const Product= ()=>{
     //     setPage(0);
     //     setKeyword(searchInput);
     // }
-    const [isShowSort,setIsShowSort]=useState(true);
-    const handleShowSort = ()=>{
-        setIsShowSort(!isShowSort);
-    }
-    // const sortProduct = ()=>{
 
+    // const [isShowSort,setIsShowSort]=useState(true);
+    // const handleShowSort = ()=>{
+    //     setIsShowSort(!isShowSort);
     // }
+    const compare = (a, b, ascendingOrder) => {
+       
+        if (a < b) {
+          return ascendingOrder ? -1 : 1;
+        }
+        if (a > b) {
+          return ascendingOrder ? 1 : -1;
+        }
+        return 0;
+      }
+      
+      const handleChange = (value) => {
+        if(value === 'none'){
+            setArrProducts([...arrProducts])
+        } else {
+          let toType, toAscending
+          switch(value){
+            case 'ascending' : toType = true; toAscending = true; break;
+            case 'descending' : toType = true; toAscending = false; break;
+            case 'high' : toType = false; toAscending = true; break;
+            case 'low' : toType = false; toAscending = false; break;
+            default:
+          }
+          let current = [...arrProducts]
+          current.sort((a, b) => toType ?
+                 compare(a.name, b.name, toAscending) 
+                 : 
+                 compare(a.price, b.price, toAscending))
+          setArrProducts([...current])
+        }
+      }
     return(
         <div className="products-content">
             <div className="breadcrumb_background_sp">
@@ -69,10 +120,15 @@ const Product= ()=>{
                 <div className="overlay"></div>
             </div>
             <div className="row py-3 px-4">
-                <div className="col-12 col-sm-12 col-md-3 col-lg-3">
+                {/* <div className="col-12 col-sm-12 col-md-3 col-lg-3">
                     <div className="card border mb-3">
-                        <h5 className="card-header" onClick={handleShowSort}>Filter</h5>
+                        <h5 className="card-header" onClick={handleShowSort}>Filter
+                        
+                        </h5>
                         <div className="card-body text-dark" style={{display:isShowSort ? "block" : "none" }}>
+                            <div className="text-end">
+                            <button class="btn btn-primary">Sort</button>
+                           </div>
                             <div className="">
                                 <div className="layered_subtitle dropdown-filter">
                                     <span>Product Category</span>
@@ -80,7 +136,14 @@ const Product= ()=>{
                                         <i className="fa-solid fa-minus"></i>
                                     </span>
                                 </div>
-                                <Category />
+                                <div className="row">
+                                    {arrCategory && arrCategory.map((item)=>{
+                                        return(
+                                            <div className="mb-2" href="sa" key={item.id}>{item.name}</div>
+                                        )
+                                    })}
+                                    
+                                </div>
                             </div>
                             <div className="">
                                 <div className="layered_subtitle dropdown-filter">
@@ -104,47 +167,65 @@ const Product= ()=>{
                                     </div>
                                 </div>
                             </div>
-                           <Color />
+                            <div className="">
+                                <div className="layered_subtitle dropdown-filter">
+                                    <span>color</span>
+                                    <span className="icon-control">
+                                        <i className="fa-solid fa-minus"></i>
+                                    </span>
+                                </div>
+                                <div className="color">
+                                {color && color.map((color)=>{
+                                    return(
+                                        <div className="form-check form-check-inline" key={color.id}>
+                                            <input className="form-check-input" style={{backgroundColor:color.code}} name="color" type="checkbox" value={color.id} title={color.name} />
+                                        </div>
+                                    )
+                                })
+                                }
+                                </div>
+                            </div>
+                           
                            
                         </div>
                     </div>
-                </div>
-                <div className="col-12 col-sm-12 col-md-9 col-lg-9" >
-                    <div className="row align-items-center">
-                        <h4 className="py-3 col-10 text-xxl-start text-xl-start text-lg-start text-md-center text-sm-center text-xs-center text-center">Tất cả sản phẩm</h4>
-                        <div className="col-2">
+                </div> */}
+                <div className="col" >
+                    <div className="row align-items-center justify-content-between">
+                        <h4 className="py-3 col-8 text-xxl-start text-xl-start text-lg-start text-md-center text-sm-center text-xs-center text-center">All Product</h4>
+                        <div className="col-3">
                             <form action="" >
-                                <select name="sort" id="sort" className="form-select">
+                                <select name="sort" className="form-select" onChange={(e) => handleChange(e.target.value)}>
                                     <option value="none">Sort by</option>
-                                    <option value="priceLowest">Price (Low to High)</option>
-                                    <option value="priceHighest">Price (High to Low)</option>
-                                    <option value="nameAtoZ">Discount (High to Low)</option>
-                                    <option value="nameZtoA">Name (A to Z)</option>
+                                    <option value="low">Price (High to Low)</option>
+                                    <option value="high">Price (Low to High)</option>
+                                    <option value="descending">Name (Z to A)</option>
+                                    <option value="ascending">Name (A to Z)</option>
                                 </select>
                             </form>
                         </div>
                     </div>
-                    <div className="row justify-content-center py-4">
+                    <div className="row justify-content-between py-4">
                         {isloaded ? arrProducts && arrProducts.map((product)=>{
                         
-                            return(
-                                <div className="col-lg-3 col-ms-6 col-sm-6 col-6" key={product.id}>
-                                <div className="product-img">
-                                {product.discountPer ? 
-                                    <div className="sale">
-                                        <span>{product.discountPer + '%'}</span>
+                            return product.hidden === 0 && (
+                                <div className="col-lg-2 col-ms-4 col-sm-6 col-6" key={product.id}>
+                                    <div className="product-img">
+                                    {product.discountPer ? 
+                                        <div className="sale">
+                                            <span>{product.discountPer + '%'}</span>
+                                        </div>
+                                        : ''}
+                                        <Link to={`detail/${product.slug}/${product.id}`}  className="change">
+                                            <img src={`${IMG_URL}/${product.photo}`} alt={product.name} className="img-fluid"/>
+                                            <ProductPhoto productId={product.id} IMG_URL={IMG_URL} />
+                                        </Link>
                                     </div>
-                                      : ''}
-                                    <Link to={`detail/${product.slug}/${product.id}`}  className="change">
-                                        <img src={`${IMG_URL}/${product.photo}`} alt={product.name} className="img-fluid"/>
-                                        <ProductPhoto productId={product.id} IMG_URL={IMG_URL} />
-                                    </Link>
+                                    <div className="product-title">
+                                        <Link to={`detail/${product.slug}/${product.id}`}>{product.name}</Link>
+                                        <p>{new Intl.NumberFormat().format(product.price)}đ <del className="card-price-old">{product.discount ? product.discount+'đ' : ''}</del></p>
+                                    </div>
                                 </div>
-                                <div className="product-title">
-                                    <Link to={`detail/${product.slug}/${product.id}`}>{product.name}</Link>
-                                    <p>{new Intl.NumberFormat().format(product.price)}đ <del className="card-price-old">{product.discount ? product.discount+'đ' : ''}</del></p>
-                                </div>
-                            </div>
                             )
                         })
                         :

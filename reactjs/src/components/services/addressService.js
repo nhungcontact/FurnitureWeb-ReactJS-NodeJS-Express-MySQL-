@@ -10,6 +10,9 @@ const createAddress = (data,userId) =>{
         }
     });
 }
+const getAllAddress = (inputId) => {
+    return axios.get(`${API_URL}/api/get-address?id=${inputId}`);
+}
 
 const getAllAddressByUserId = (inputId) => {
     return axios.get(`${API_URL}/api/get-address-by-user?id=${inputId}`)
@@ -38,6 +41,7 @@ const deleteAllCart = (userId) =>{
 
 export {
     createAddress,
+    getAllAddress,
     getAllAddressByUserId,
     deleteCart,
     updateAddress,

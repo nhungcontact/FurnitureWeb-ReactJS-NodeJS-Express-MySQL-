@@ -4,14 +4,14 @@ import swal from 'sweetalert2';
 import RichTextEditor from "../../RichTextEditor";
 import { useParams } from "react-router-dom";
 import { IMG_URL } from "../../../../config/imgUrl";
-import { getAllBlogs } from "../../../../services/blogService";
+import { getAllBlogs, updateBlog } from "../../../../services/blogService";
 const EditBlog =()=>{
 
     const {id} = useParams();
 
 
     const [arrEditBlog,setArrEditBlog]=useState({
-        id:'',name: '',photo:'',writer:'',slug:'',content:'',hidden:'',newBlog:''
+        id:'',name: '',photo:'',writer:'',slug:'',description:'',content:'',hidden:'',newBlog:''
     });
     const [urlPhoto,setUrlPhoto]=useState({
         imagePreview:''
@@ -68,12 +68,15 @@ const EditBlog =()=>{
     };
     
     const handleAddNewBlog = ()=>{
-        const {name,photo,writer,slug,content,hidden,newBlog}=arrEditBlog;
+        const {id,name,photo,writer,slug,description,content,hidden,newBlog}=arrEditBlog;
+        
         const formData = new FormData();
+        formData.append('id',id)
         formData.append('name',name)
         formData.append('photo',photo)
         formData.append('writer',writer)
         formData.append('slug',slug)
+        formData.append('description',description)
         formData.append('content',content)
         formData.append('hidden',hidden)
         formData.append('new',newBlog)
@@ -85,26 +88,28 @@ const EditBlog =()=>{
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Add!'
+                confirmButtonText: 'Save!'
               }).then(async(result) => {
                 if (result.isConfirmed) {
-                    // let list = await createBlog(formData);
-                    // if(list.data && list.data.errCode !== 0 ){
-                    //     swal.fire({
-                    //         icon: 'error',
-                    //         title: 'Oops...',
-                    //         text: list.data.message,
-                    //         })
-                    // }
-                    // if(list.data && list.data.errCode === 0 ){
+                    console.log(arrEditBlog);
+                    let list = await updateBlog(formData);
+                    console.log(list);
+                    if(list.data && list.data.errCode !== 0 ){
+                        swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: list.data.message,
+                            })
+                    }
+                    if(list.data && list.data.errCode === 0 ){
                         
-                    //         swal.fire(
-                    //             'Add blog!',
-                    //             'Your blog has been added.',
-                    //             'success'
-                    //         )
-                    //         // window.location.href = "/admin/list-blog"
-                    // }
+                            swal.fire(
+                                'Edit blog!',
+                                'Your blog has been updated.',
+                                'success'
+                            )
+                            window.location.href = "/admin/list-blog"
+                    }
                 }
               })
         
@@ -142,7 +147,7 @@ const EditBlog =()=>{
             </div>
             <ol className="breadcrumb mb-30">
                 <li className="breadcrumb-item"><a href="/">Dashboard</a></li>
-                <li className="breadcrumb-item"><a href="/admin/blog/create">Blog</a></li>
+                <li className="breadcrumb-item"><a href="/admin/blog">Blog</a></li>
                 <li className="breadcrumb-item active">Edit Blog</li>
             </ol>
             <div className="row">
@@ -184,7 +189,7 @@ const EditBlog =()=>{
                                     name="photo"
                                     onChange={(event)=> handleChangeImage(event)}
                                     />
-                                {/* {urlPhoto.imagePreview &&
+                                {urlPhoto.imagePreview ?
                                     <img src={urlPhoto.imagePreview} 
                                         alt="photos" 
                                         className="img-fluid" 
@@ -193,9 +198,8 @@ const EditBlog =()=>{
                                             // width: "200px",
                                             // height: "200px"
                                             }}/>
-                                }
-                                 */}
-                                 <img src={`${IMG_URL}/${arrEditBlog.photo}`} 
+                                    :
+                                    <img src={`${IMG_URL}/${arrEditBlog.photo}`} 
                                         alt="photos" 
                                         className="img-fluid" 
                                         style={{
@@ -203,6 +207,9 @@ const EditBlog =()=>{
                                             // width: "200px",
                                             // height: "200px"
                                             }}/>
+                                }
+                                
+                                
                             </div>
 
                             <div className="col-12 mb-3">
@@ -237,7 +244,7 @@ const EditBlog =()=>{
                             <div className="col-12 mb-3">
                                 <label className="form-label">Hidden:</label>
                                 <div class="form-check form-switch">
-                                    <input className="form-check-input" type="checkbox" role="switch" id="hidden" name="hidden" checked={arrEditBlog.hidden ? '1':''} 
+                                    <input className="form-check-input" type="checkbox" role="switch" id="hidden" name="hidden" checked={arrEditBlog.hidden} 
                                         onChange={(e) => {
                                             handleOnChange({
                                             target: {
@@ -254,7 +261,7 @@ const EditBlog =()=>{
                             <div className="col-12">
                                 <label className="form-label">New Blog:</label>
                                 <div class="form-check form-switch">
-                                    <input className="form-check-input" type="checkbox" role="switch" id="newBlog" name="newBlog" checked={arrEditBlog.newBlog ? '1':''} 
+                                    <input className="form-check-input" type="checkbox" role="switch" id="newBlog" name="newBlog" checked={arrEditBlog.newBlog} 
                                         onChange={(e) => {
                                             handleOnChange({
                                             target: {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "reactstrap";
 import SelectCategory from "../../category/SelectCategory";
-import { createNewProductPhotoService, createNewProductService,getAllProducts, getAllProductPhoto } from "../../../../services/productService";
+import { getAllProducts, getAllProductPhoto, getDetailProductService, updateProductService } from "../../../../services/productService";
 // import { createNewProductColorService } from "../../../../services/productService";
 import ImageUploading from 'react-images-uploading';
 import swal from 'sweetalert2';
@@ -15,7 +15,7 @@ const EditProduct =()=>{
 
 
     const [arrEditProduct,setArrEditProduct]=useState({
-        id:'',name: '',photo:'',price:'',discount:'',discountPer:'',totalQty:'',slug:'',content:'',hidden:'',newArrival:'',categoryId:''
+        name: '',photo:'',price:'',discount:'',discountPer:'',totalQty:'',slug:'',content:'',hidden:'',newArrival:'',categoryId:''
     });
 
     const maxNumber = 69;
@@ -51,7 +51,6 @@ const EditProduct =()=>{
     };
     const onChange = (imageList, addUpdateIndex) => {
         setImages(imageList);
-        console.log(images);
     };
     const handleSubmitColor = (list)=>{
         setListDetail(list);
@@ -90,30 +89,40 @@ const EditProduct =()=>{
         
     };
     useEffect(()=>{
-        getProductByIdFromReact();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[id])
-    useEffect(()=>{
-        getAllProductPhotoFromReact()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[arrEditProduct.id])
-
-    const getProductByIdFromReact =async()=>{
-        const product =  await getAllProducts(id);
-        if( (product && product.data.errCode === 0)){
-            setArrEditProduct(product.data.products);
-        }
-    }
-    const getAllProductPhotoFromReact = async()=>{
-        const productphoto = await getAllProductPhoto(arrEditProduct.id);
-        if(productphoto && productphoto.data.productphotos){
-            for(let i= 0;i<productphoto.data.productphotos.length;i++){
-                images.push(productphoto.data.productphotos[i].path)
+        const getDetailProductFormReact = async ()=>{
+            const detail = await getDetailProductService(id);
+            if( (detail && detail.data.errCode === 0)){
+                
+                setListDetail(detail.data.detailproducts);
             }
-            // setImages(images => [...images, ...productphoto.data.productphotos]);
         }
-        console.log(images);
-    }
+        getDetailProductFormReact();
+    },[id]);
+
+    useEffect(()=>{
+        
+        const getProductByIdFromReact =async()=>{
+            const product =  await getAllProducts(id);
+            if( (product && product.data.errCode === 0)){
+                setArrEditProduct(product.data.products);
+            }
+        }
+        getProductByIdFromReact();
+    },[id])
+
+    useEffect(()=>{
+        const getAllProductPhotoFromReact = async()=>{
+            const productphoto = await getAllProductPhoto(id);
+            if(productphoto && productphoto.data.errCode === 0){
+                console.log(productphoto);
+                setImages(productphoto.data.productphotos);
+            }
+        }
+        getAllProductPhotoFromReact()
+    },[id]);
+
+    
+    
     const handleSelectCategory = (value)=>{
         setArrEditProduct({
             ...arrEditProduct,categoryId:value
@@ -121,7 +130,6 @@ const EditProduct =()=>{
 
     }
     const formValidProduct = ({ ...rest }) => {
-        console.log(rest)
         let valid = true;
         if(rest.name === ''&&rest.photo === '' && rest.totalQty=== '' 
                 && rest.price === '' && rest.categoryId==='' && rest.slug === '' 
@@ -133,28 +141,24 @@ const EditProduct =()=>{
     
     const formValidDetailColor = ([...rest])=>{
         let valid = true;
-        let total=0;
         for(let i=0;i<rest.length;i++){
             if(rest[i].colorId === '' && rest[i].qtyProduct === ''){
                 valid=false;
             }
-            total = total + parseInt(rest[i].qtyProduct);
         }
-        setTotalQuantity(total);
         return valid;
     }
     const formValidProductPhoto = ({...rest})=>{
-        console.log(rest)
         let valid = true;
         if(Object.keys(rest).length === 0){
             valid=false;
         }
-        console.log('photo',valid)
         return valid;
     }
     const handleAddNewProduct = ()=>{
         const {name,photo,price,discount,discountPer,totalQty,slug,content,hidden,newArrival,categoryId}=arrEditProduct;
         const formDataProduct = new FormData();
+        formDataProduct.append('id',id)
         formDataProduct.append('name',name)
         formDataProduct.append('photo',photo)
         formDataProduct.append('price',price)
@@ -167,50 +171,40 @@ const EditProduct =()=>{
         formDataProduct.append('newArrival',newArrival)
         formDataProduct.append('categoryId',categoryId);
         formDataProduct.append(`detailProduct`, JSON.stringify(listDetail));
+        
         if(formValidProduct(arrEditProduct) && formValidDetailColor(listDetail) && formValidProductPhoto(images)){
-            if(totalQuantity === parseInt(totalQty)){
+            let total=0;
+            for(let i = 0;i<listDetail.length;i++){
+                total += parseInt(listDetail[i].qtyProduct);
+            }
+            if(total === parseInt(totalQty)){
+                
                 swal.fire({
                     title: 'Are you sure?',
-                    text: "You want to Add New Product?",
+                    text: "You want to update product?",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: 'Add!'
+                    confirmButtonText: 'Save!'
                   }).then(async(result) => {
                     if (result.isConfirmed) {
-                        let list = await createNewProductService(formDataProduct);
+                        let list = await updateProductService(formDataProduct);
                         if(list.data && list.data.errCode !== 0 ){
                             swal.fire({
                                 icon: 'error',
                                 title: 'Oops...',
                                 text: list.data.message,
                                 })
+                        }else{
+                            swal.fire(
+                                'Update product!',
+                                'Your product has been saved.',
+                                'success'
+                            )
+                            window.location.href = "/admin/list-product"
                         }
-                        if(list.data && list.data.errCode === 0 ){
-                            const formDataProductPhoto = new FormData();
-                            formDataProductPhoto.append('productName',name)
-                            for(let i=0;i<images.length;i++){
-                                formDataProductPhoto.append('productphoto',images[i].file)
-                            }
-                            // add galleries
-                            let listProductPhoto = await createNewProductPhotoService(formDataProductPhoto);
-                            if(listProductPhoto.data && listProductPhoto.data.errCode !== 0){
-                                swal.fire({
-                                    icon: 'error',
-                                    title: 'Oops...',
-                                    text: listProductPhoto.data.message,
-                                })
-                            }
-                            if(listProductPhoto.data && listProductPhoto.data.errCode === 0){
-                                swal.fire(
-                                    'Add product!',
-                                    'Your product has been added.',
-                                    'success'
-                                )
-                                // window.location.href = "/admin/list-product"
-                            }
-                        }
+                       
                     }
                   })
             }else{
@@ -279,7 +273,7 @@ const EditProduct =()=>{
                             
                             <div className="col-md-4 mb-3">
                                 <label className="form-label">Category<b className="text-danger">*</b>:</label>
-                                <SelectCategory onSelected={handleSelectCategory}/>
+                                <SelectCategory onSelected={handleSelectCategory} value={arrEditProduct.categoryId}/>
                             </div>
                            
                             <div className="col-12 mb-3">
@@ -360,7 +354,7 @@ const EditProduct =()=>{
                                             {image['data_url'] ?
                                             <img src={image['data_url']} alt="" width="150" className="my-3" />
                                             :
-                                            <img src={`${IMG_URL}/${image}`} alt="" width="150" className="my-3" />
+                                            <img src={`${IMG_URL}/${image.path}`} alt="" width="150" className="my-3" />
                                             }
                                                 <button className="btn-remove" onClick={() => onImageRemove(index)}><i class="fa-solid fa-minus"></i></button>
                                                 <button className="btn-update" onClick={() => onImageUpdate(index)}><i class="fa-regular fa-pen-to-square"></i></button>
@@ -501,15 +495,15 @@ const EditProduct =()=>{
                                             <div className="d-flex algin-item-center mb-2">
                                                 <div className="row">
                                                     <div className="col-12">
-                                                    <SelectColor onChangeColor={handleSubmitColor} index={index} listDetail={listDetail}/>
+                                                    
+                                                    <SelectColor onChangeColor={handleSubmitColor} value={item.colorId} index={index} listDetail={listDetail}/>
                                                     </div>
                                                     <div className="col-12 mt-2">
                                                         <label className="form-label">Quantity Product:</label>
                                                         <input type="number" name="qtyProduct" value={item.qtyProduct} className="form-control" onChange={(event)=>handleOnChangeDetail(event,index)}/>
                                                     </div>
                                                 </div>
-                                                {/* <input type="color" value={item.color} name="color" onChange={(event)=>handleOnChangeColor(event,index)} />
-                                                <p className="mx-2" style={ { color: `${ item.color }`,margin:'0px' } }>{item.color}</p> */}
+                                               
                                                 {listDetail.length !== 1 && (
                                                     <div>
                                                         <button

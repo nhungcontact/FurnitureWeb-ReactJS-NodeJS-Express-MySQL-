@@ -31,36 +31,36 @@ const CheckoutDetail = ()=>{
     },[index]);
     
     const getUserFromReact = async()=>{
-        let email = sessionStorage.getItem('email');
+        let email = localStorage.getItem('email');
         if (email) {
             let data= await getUserByEmail(email);
             if (data && data.data.errCode === 0) {
                 setUser(data.data.user);
                 let address = await getAllAddressByUserId(data.data.user.id);
+                
                 if(address && address.data.errCode===0){
                     setListAddress(address.data.address);
-                    setAddress(address.data.address[index]);
+                    if(address.data.address.length !== 0){
+                        setAddress(address.data.address[index]);
+                    }else{
+                        setAddress({});
+                    }
                 }
             }
-            let order = await sessionStorage.getItem('data');
-            console.log('order',JSON.parse(order));
+            let order = await localStorage.getItem('data');
             setOrder(JSON.parse(order));
-            // const current = new Date();
-            // const date = `${current.getDate()+2}/${current.getMonth()+1}/${current.getFullYear()}`;
-            // setDeliveryDate(date);
 
         }
     }
    
-    
    const handleGetIndex = async(i)=>{
-    console.log(i)
         setIndex(i);
         setIsOpenModalAddress(false)
         await getUserFromReact();
         Swal.fire('Saved!', '', 'success')
         
    }
+   
    const handleAddOrder = async(tt,idU,idAdr,list)=>{
     let orderId = Math.floor(Math.random() * Math.floor(Math.random() * Date.now()))
     let pp = list.filter( (ele, ind) => ind === list.findIndex( elem => elem.productId === ele.productId && elem.color === ele.color&&elem.price === ele.price))
@@ -68,54 +68,65 @@ const CheckoutDetail = ()=>{
         number: orderId,
         grandTotal:tt,
         userId:idU,
-        addressId:idAdr,
+        addressId:idAdr ? idAdr : '',
         list:pp
     }
     if(data.grandTotal !== 0){
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-          }).then(async(result)=>{
-            if(result.isConfirmed){
-                try {
-                    let order = await addOrder(data);
-                    if(order && order.data.errCode === 0){
-                        let res = await deleteAllCart(user.id);
-                        if(res && res.data.errCode === 0){
-                            Swal.fire(
-                                'You order success!',
-                                order.data.errMessage,
-                                'success'
-                            )
+        if(data.addressId !== ''){
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+              }).then(async(result)=>{
+                if(result.isConfirmed){
+                    try {
+                        let order = await addOrder(data);
+                        if(order && order.data.errCode === 0){
+                            let res = await deleteAllCart(user.id);
+                            if(res && res.data.errCode === 0){
+                                Swal.fire(
+                                    'You order success!',
+                                    order.data.errMessage,
+                                    'success'
+                                )
+                                window.location.href = "/product";
+                                
+                            }else{
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: res.data.errMessage,
+                                })
+                            }
+                            
                         }else{
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Oops...',
-                                text: res.data.errMessage,
+                                text: order.data.errMessage,
                             })
                         }
-                        
-                    }else{
+                    } catch (error) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
-                            text: order.data.errMessage,
+                            text: error,
                         })
                     }
-                } catch (error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: error,
-                    })
                 }
-            }
-          })
+              })
+        }
+        else{
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Please check your address!',
+              })
+        }
     }else{
         Swal.fire({
             icon: 'error',
@@ -153,25 +164,31 @@ const CheckoutDetail = ()=>{
                             </div>
                         </div>
                         <hr/>
-                        <div className="row cart-content" >
-                            <div className="col-12 mb-4">
-                                <b className="me-2">Full Name: </b>
-                                <span>{address.fullName}</span>
-                            </div>
-                            
-                            <div className="col-12 mb-4">
-                                <b className="me-2">Phone Number: </b>
-                                <span>{address.phoneNumber}</span>
-                            </div>
-                            <div className="col-12 mb-4">
-                                <b className="me-2">Address: </b>
-                                <span>{address.ward}, {address.district}, {address.city}</span>
-                            </div>
-                            <div class="col-12 mb-4">
-                                <b className="me-2">Shipping Address: </b>
-                                <span>{address.shippingAdr}</span>
-                            </div>
-                        </div>
+                        
+                            {Object.keys(address).length !== 0 ? (
+                                <div className="row cart-content" >
+                                    <div className="col-12 mb-4">
+                                        <b className="me-2">Full Name: </b>
+                                        <span>{address.fullName}</span>
+                                    </div>
+                                    
+                                    <div className="col-12 mb-4">
+                                        <b className="me-2">Phone Number: </b>
+                                        <span>{address.phoneNumber}</span>
+                                    </div>
+                                    <div className="col-12 mb-4">
+                                        <b className="me-2">Address: </b>
+                                        <span>{address.ward}, {address.district}, {address.city}</span>
+                                    </div>
+                                    <div class="col-12 mb-4">
+                                        <b className="me-2">Shipping Address: </b>
+                                        <span>{address.shippingAdr}</span>
+                                    </div>
+                                </div>
+                            ):
+                            <p>No Address</p>
+                            }
+                        
                         
                     </div>
                     <div className="cart mt-4">
@@ -180,7 +197,7 @@ const CheckoutDetail = ()=>{
                         <div className="row cart-content">
                             <div class="col-12 mb-4">
                                 <label class="form-label">Message:</label>
-                                <textarea class="form-control" rows="3" value={message} onChange={(e)=>setMessage(e)}></textarea>
+                                <textarea class="form-control" rows="3" value={message} onChange={(e)=>setMessage(e.target.value)}></textarea>
                             </div>
                         </div>
 
@@ -207,7 +224,7 @@ const CheckoutDetail = ()=>{
                                         <b>Subtotal Price:</b>
                                         </div>
                                         <div className="col-6">
-                                        {new Intl.NumberFormat().format(order.grandTotal)}đ
+                                        {order.grandTotal ? new Intl.NumberFormat().format(order.grandTotal) : '0'}đ
                                         </div>
                                     </div>
                                     <div className="row mb-4">

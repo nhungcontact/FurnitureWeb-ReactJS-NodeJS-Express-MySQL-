@@ -108,19 +108,19 @@ const ModalCategory = (props) => {
             size="lg"
             centered
         >
-            <ModalHeader toggle={()=>{toggle()}}>Thêm Loại Sản Phẩm</ModalHeader>
+            <ModalHeader toggle={()=>{toggle()}}>Add a category</ModalHeader>
             <ModalBody>
                 <div className="container">
                     <div className="">
                         <div className="row g-3">
                             <div className="col-md-8">
-                                <label className="form-label">Tên<b className="text-danger">*</b>:</label>
+                                <label className="form-label">Name<b className="text-danger">*</b>:</label>
                                 <input type="text" 
                                     required name="name" value={arrInput.name} className="form-control" onChange={(e)=>handleChange(e)} />
                             </div>
                             
                             <div className="col-md-8">
-                                <label className="form-label">Mô Tả<b className="text-danger">*</b>:</label>
+                                <label className="form-label">Description<b className="text-danger">*</b>:</label>
                                 <input type="text" required name="description" value={arrInput.description} className="form-control" onChange={(e)=>handleChange(e)} />
                             </div>
                             

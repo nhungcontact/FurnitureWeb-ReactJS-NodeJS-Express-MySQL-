@@ -32,7 +32,7 @@ const deleteAllCart = (userId) =>{
 
 const setOder = async (data) => {
     if (typeof window !== "undefined") {
-        sessionStorage.setItem('data',JSON.stringify(data));
+        localStorage.setItem('data',JSON.stringify(data));
         
         setTimeout(
             function () {

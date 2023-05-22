@@ -126,19 +126,19 @@ const ModalEditCategory =(props)=> {
             size="lg"
             centered
         >
-            <ModalHeader toggle={toggle}>Sửa Loại Sản Phẩm</ModalHeader>
+            <ModalHeader toggle={toggle}>Edit Category</ModalHeader>
             <ModalBody>
                 <div className="container">
                     <div className="">
                         <div className="row g-3">
                             <div className="col-md-8">
-                                <label className="form-label" htmlFor="name">Tên<b className="text-danger">*</b>:</label>
+                                <label className="form-label" htmlFor="name">Name<b className="text-danger">*</b>:</label>
                                 <input type="text" 
                                     required name="name" id="name" value={arrInput.name} className="form-control" onChange={handleChange} />
                             </div>
                             
                             <div className="col-md-8">
-                                <label className="form-label" htmlFor="description">Mô Tả<b className="text-danger">*</b>:</label>
+                                <label className="form-label" htmlFor="description">Description<b className="text-danger">*</b>:</label>
                                 <input type="text" required name="description" id="description" value={arrInput.description} className="form-control" onChange={handleChange} />
                             </div>
                             

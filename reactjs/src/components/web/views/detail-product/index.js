@@ -10,6 +10,7 @@ import Color from './Color';
 import { addCart } from '../../../services/cartService';
 import Swal from 'sweetalert2';
 import { getUserByEmail } from '../../../services/userService';
+import Feedback from './Feedback';
 
 const DetailProduct = ()=>{
     const {id} = useParams();
@@ -50,7 +51,7 @@ const DetailProduct = ()=>{
     },[]);
     
     const getUserFromReact = async()=>{
-        let email = sessionStorage.getItem('email')
+        let email = localStorage.getItem('email')
         if (email) {
             let user = await getUserByEmail(email);
             if (user && user.data.errCode === 0) {
@@ -102,11 +103,17 @@ const DetailProduct = ()=>{
                     window.location.href = "/cart";
                 }
             })
-        }else{
+        }else if(cart.color === ''){
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
                 text: 'Please select color!',
+              })
+        }else{
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Please login or register!',
               })
         }
 
@@ -176,10 +183,10 @@ const DetailProduct = ()=>{
                                         } products</p><br />
                         </div>
                     </div>
-                    {/* <div className="mt-3">
+                    <div className="mt-3">
                         <p><b>About product</b></p>
-                        {product.content}
-                    </div> */}
+                        <p dangerouslySetInnerHTML={{__html: product.content}} class="ql-editor" />
+                    </div>
                     
                     <hr/>
                     <div className='mb-5'>
@@ -192,6 +199,8 @@ const DetailProduct = ()=>{
                     </div>
                 </div>
             </div>
+            <hr />
+            <Feedback productId={product.id}/>
         </div>
         </>
     )

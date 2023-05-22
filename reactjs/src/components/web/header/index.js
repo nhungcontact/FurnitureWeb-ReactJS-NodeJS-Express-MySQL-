@@ -27,7 +27,7 @@ const Header =()=> {
   const getUser = async()=>{
     let cookies = await isAuthenticate();
     setToken(cookies);
-    let email = sessionStorage.getItem('email');
+    let email = localStorage.getItem('email');
     if (email) {
         let user = await getUserByEmail(email);
         if (user && user.data.errCode === 0) {
@@ -36,17 +36,18 @@ const Header =()=> {
         }
     }
   }
+
   useEffect(()=>{
+    const getCart = async()=>{
+      const cart = await getCartByUserId(userId);
+      if(cart && cart.data.errCode === 0){
+        setQtyCart(cart.data.carts.length);
+      }
+    }
     getCart()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[userId]);
 
-  const getCart = async()=>{
-    const cart = await getCartByUserId(userId);
-    if(cart && cart.data.errCode === 0){
-      setQtyCart(cart.data.carts.length);
-    }
-  }
+  
  const handleLogout = async () => {
     // event.preventDefault();
     await logout();

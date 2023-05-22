@@ -58,6 +58,9 @@ const SideBar =(props)=>{
                             <NavLink className={(navData) => navData.isActive ? "active" : "" } to="users" ><i class="fa-regular fa-user"></i> User</NavLink>
                         </li>
                         <li>
+                            <NavLink className={(navData) => navData.isActive ? "active" : "" } to="orders" ><i class="fa-solid fa-box-open"></i> Order</NavLink>
+                        </li>
+                        <li>
                         <p class="title-nav text-black-50 mt-4 text-uppercase">Interfaces</p>
                             <span className='dropdown-toggle'
                                 onClick={handleOpenNews}
@@ -77,6 +80,12 @@ const SideBar =(props)=>{
                                     </li>
                                 </ul>
                             </Collapse>
+                        </li>
+                        <li>
+                            <NavLink className={(navData) => navData.isActive ? "active" : "" } to="list-comment" ><i class="fa-regular fa-comment"></i> Comment</NavLink>
+                        </li>
+                        <li>
+                            <NavLink className={(navData) => navData.isActive ? "active" : "" } to="list-feedback" ><i class="fa-regular fa-envelope"></i> Feedback</NavLink>
                         </li>
                         
                     </ul>

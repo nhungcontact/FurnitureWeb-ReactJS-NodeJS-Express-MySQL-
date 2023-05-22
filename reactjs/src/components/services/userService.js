@@ -34,27 +34,31 @@ const editUserService = async(inputData) =>{
 
 const authenticate = async (data, email) => {
     if (typeof window !== "undefined") {
-        sessionStorage.setItem('id', data)
-        sessionStorage.setItem('email', email)
-        setTimeout(
-            function () {
-                window.location.reload();
-            },
-            1000
-        );
+        localStorage.setItem('id', data)
+        localStorage.setItem('email', email)
+        if(email === 'admin@gmail.com'){
+            setTimeout(() => {
+                window.location.replace('/admin');
+              }, 1000);
+        }else{
+            setTimeout(() => {
+                // 👇️ redirects to an external URL
+                window.location.replace('/');
+              }, 1000);
+        }
     }
 };
 const isAuthenticate = () => {
     if (typeof window == 'undefined') {
         return false;
     }
-    return sessionStorage.getItem('id');
+    return localStorage.getItem('id');
 };
 
 const logout = () => {
     if (typeof window !== "undefined") {
-        sessionStorage.removeItem('id');
-        sessionStorage.removeItem('email');
+        localStorage.removeItem('id');
+        localStorage.removeItem('email');
         window.location.href = "/";
     }
 };

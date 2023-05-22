@@ -41,7 +41,7 @@ const Profile = ()=>{
     },[]);
     
     const getUserFromReact = async()=>{
-        let email = sessionStorage.getItem('email')
+        let email = localStorage.getItem('email')
         if (email) {
             let data= await getUserByEmail(email);
             if (data && data.data.errCode === 0) {
@@ -89,7 +89,7 @@ const Profile = ()=>{
                     });
                 }
                 if(list.data && list.data.errCode === 0 ){
-                    toast.success('Login success!', {
+                    toast.success('Update success!', {
                         position: "top-right",
                         autoClose: 2000,
                         hideProgressBar: false,

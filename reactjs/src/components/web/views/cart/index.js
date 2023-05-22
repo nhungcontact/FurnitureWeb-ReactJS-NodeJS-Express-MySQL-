@@ -19,7 +19,7 @@ const Cart = ()=>{
     },[]);
 
     const getCartFromReact = async()=>{
-        let email = sessionStorage.getItem('email')
+        let email = localStorage.getItem('email')
         if (email) {
             let user = await getUserByEmail(email);
             if (user && user.data.errCode === 0) {
@@ -65,7 +65,6 @@ const Cart = ()=>{
         }
         setTotal(tt);
     }
-    console.log(price);
     const handleDeleteAllCart= (id)=>{
         Swal.fire({
             title: 'Are you sure?',
@@ -112,8 +111,10 @@ const Cart = ()=>{
             grandTotal:tt,
             list:list
         }
-        await setOder(data);
-        window.location.href = "checkout";
+            await setOder(data);
+            window.location.href = "checkout";
+       
+        
     }
     return(
         <>

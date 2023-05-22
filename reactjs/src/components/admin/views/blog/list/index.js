@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import { Link } from 'react-router-dom';
 import '../../../../styles/Login.css';
-import { getAllBlogs } from '../../../../services/blogService';
+import { deleteBlog, getAllBlogs } from '../../../../services/blogService';
 import { IMG_URL } from '../../../../config/imgUrl';
 import {ThreeDots} from 'react-loader-spinner';
 import Pagination from '../../../../pagination';
@@ -12,6 +12,8 @@ import Swal from 'sweetalert2';
 const ListBlog =()=> {
 
     const [arrBlogs,setArrBlogs]=useState([]);
+    const [blogData,setBlogData]=useState([]);
+
     const [isloaded,setIsLoaded]=useState(false);
     const [offset, setOffset] = useState(0);
     const [perPage]=useState(10);
@@ -28,15 +30,18 @@ const ListBlog =()=> {
     const getAllBlogsFromReact = async()=>{
         setIsLoaded(false);
         const response = await getAllBlogs('ALL');
-        console.log(response)
         if(response && response.data.errCode === 0){
-            var tdata = response.data.blogs;
-            var slice = tdata.slice(offset, offset + perPage)
+            setBlogData(response.data.blogs);
+            pagination(response.data.blogs);
+            
+        }
+    }
+    const pagination = (tdata)=>{
+        var slice = tdata.slice(offset, offset + perPage)
             setPageCount(Math.ceil(tdata.length / perPage));
             // setPagProduct(tdata);
             setArrBlogs(slice);
             setIsLoaded(true);
-        }
     }
     const handlePageClick = (e) => {
         const selectedPage = e.selected;
@@ -46,7 +51,7 @@ const ListBlog =()=> {
         // loadMoreData();
     };
     
-    const handleDeleteBlog= async(product)=>{
+    const handleDeleteBlog= async(blog)=>{
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -58,12 +63,12 @@ const ListBlog =()=> {
           }).then(async(result) => {
             if (result.isConfirmed) {
                 try {
-                    // let res = await deleteProductService(product.id);
-                    // if(res && res.data.errCode === 0){
-                    //     await getAllBlogsFromReact();
-                    // }else{
-                    //     alert(res.data.errMessage)
-                    // }
+                    let res = await deleteBlog(blog.id);
+                    if(res && res.data.errCode === 0){
+                        await getAllBlogsFromReact();
+                    }else{
+                        alert(res.data.errMessage)
+                    }
                 } catch (error) {
                     console.log(error)
                 }
@@ -75,40 +80,47 @@ const ListBlog =()=> {
             }
           })
     }  
-   
+    const [filterParam, setFilterParam] = useState('');
+
+    const handleFilter = async(e)=>{
+        setFilterParam(e.target.value);
+        if(e.target.value===''){
+            setArrBlogs(blogData);
+        }else{
+            const search = blogData.filter(item => (item.name.toLowerCase().includes(e.target.value.toLowerCase())|| item.writer.toLowerCase().includes(e.target.value.toLowerCase())));
+            setArrBlogs(search)
+        }
+        
+
+    }
     return (
         <div className='list'>
             <div className="row">
                 <div className="col-lg-5 col-md-9 col-lg-6">
-                    <h3 className="mt-30 page-title">Product</h3>
+                    <h3 className="mt-30 page-title">Blog</h3>
                 </div>
-                {/* <div className="col-lg-5 col-md-3 col-lg-6 back-btn">
-                    <Button variant="contained" onClick={(e) => this.handleBack()}><i className="fas fa-arrow-left" /> Back</Button>
-                </div> */}
+              
             </div>
             <ol className="breadcrumb mb-30">
                 <li className="breadcrumb-item"><a href="index.html">Dashboard</a></li>
-                <li className="breadcrumb-item active">Product</li>
+                <li className="breadcrumb-item active">Blog</li>
             </ol>
           
             <div className='form-container mt-4'>
-                <h4 className='text-center form-title'>List Of Products</h4>
+                <h4 className='text-center form-title'>List Of Blogs</h4>
                 <div className='form-body'>
                     <div className='d-flex justify-content-between align-items-center'>
-                        <div className='d-flex'>
-                            {/* <form className="d-flex" onSubmit={searchData}>
-                                <input
-                                    className='form-control'
-                                    type="text"
-                                    placeholder="Search...."
-                                    onChange={e=>setSearchInput(e.target.value)}
-                                    value={searchInput} />
-                                <button type='submit' style={{whiteSpace:"nowrap"}} className='btn btn-primary'>Search</button>
-                            </form> */}
-                            <div className='mx-2'>
-                                <a href='/admin/add-product'><button className='btn add-product'><i class="fa-solid fa-plus me-2"></i>Add</button></a>
+                            <div class="search">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input className="form-control" type="text" placeholder="Search name, writer..." 
+                                    value={filterParam}
+                                    onChange={(e) => handleFilter(e)}
+
+                                />
                             </div>
-                        </div>
+                            <div className='mx-2'>
+                                <a href='/admin/add-blog'><button className='btn add-product'><i class="fa-solid fa-plus me-2"></i>Add</button></a>
+                            </div>
                     </div>
                    
                     <div className='table-responsive mt-5 mb-3'>

@@ -1,8 +1,11 @@
-import Select from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 import { useEffect,useState } from 'react';
 import { getAllCategories } from '../../../services/categoryService';
 
 const SelectCategory =(props)=>{
+    const [value,setValue]=useState({});
+    const val= props.value;
+
     const Arrays = (data, fieldName, fieldValue) => {
         let arrayItem = [];
         if (data && Array.isArray(data)) {
@@ -14,31 +17,45 @@ const SelectCategory =(props)=>{
         return arrayItem;
     };
 
-    const [getList,setGetList]=useState({});
+    const [getList,setGetList]=useState([]);
 
     useEffect (()=>{
-        getAllCategoriesFromReact();
-    },[])
-
-    const getAllCategoriesFromReact = async() =>{
-        let response = await getAllCategories('ALL');
-        if(response && response.data.errCode === 0){
-            setGetList(response.data.categories)
+        const getAllCategoriesFromReact = async() =>{
+            let response = await getAllCategories('ALL');
+            if(response && response.data.errCode === 0){
+                var data = response.data.categories;
+                setGetList(data);
+                for(let i=0;i<data.length;i++){
+                    if(data[i].id === val){
+                        setValue({
+                            value:data[i].id,
+                            label:data[i].name
+                        })
+                    }
+                }
+            }
         }
-    }
+        getAllCategoriesFromReact();
+    },[val])
+    
+    
     const handleSelectChange = (name) => {
         props.onSelected(name.value)
+        setValue({
+            value:name.value,
+            label:name.label
+        })
     };
 
-      
+    
     return(
-        <Select 
-            name="typeId" 
-            defaultValue={Arrays(getList, "name", "id")[0]}
+        <CreatableSelect 
+            name="categoryId" 
+            value={value}
             isSearchable={true} 
             onChange={handleSelectChange} 
             options={Arrays(getList, "name", "id")} 
-            placeholder="Select..."
+            
             />
     )
 }

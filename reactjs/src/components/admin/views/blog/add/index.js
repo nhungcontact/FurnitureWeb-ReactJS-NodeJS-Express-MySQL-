@@ -7,7 +7,7 @@ import { createBlog } from "../../../../services/blogService";
 const AddBlog =()=>{
 
     const [arrInput,setArrProduct]=useState({
-        name: '',photo:'',writer:'',slug:'',content:'',hidden:false,newBlog:false
+        name: '',photo:'',writer:'',slug:'', description: '',content:'',hidden:false,newBlog:false
     });
     const [urlPhoto,setUrlPhoto]=useState({
         imagePreview:''
@@ -50,12 +50,13 @@ const AddBlog =()=>{
         return valid;
     };
     const handleAddNewBlog = ()=>{
-        const {name,photo,writer,slug,content,hidden,newBlog}=arrInput;
+        const {name,photo,writer,slug,description,content,hidden,newBlog}=arrInput;
         const formData = new FormData();
         formData.append('name',name)
         formData.append('photo',photo)
         formData.append('writer',writer)
         formData.append('slug',slug)
+        formData.append('description',description)
         formData.append('content',content)
         formData.append('hidden',hidden)
         formData.append('newBlog',newBlog)
@@ -85,7 +86,7 @@ const AddBlog =()=>{
                                     'Your blog has been added.',
                                     'success'
                                 )
-                                // window.location.href = "/admin/list-blog"
+                                window.location.href = "/admin/list-blog"
                         }
                     }
                   })
@@ -173,6 +174,17 @@ const AddBlog =()=>{
                                     required 
                                     value={arrInput.writer}
                                     name="writer" 
+                                    className="form-control" 
+                                    onChange={(event) => handleOnChange(event)} />
+                            </div>
+
+                            <div className="col-12 mb-3">
+                                <label className="form-label">Description<b className="text-danger">*</b>:</label>
+                                <textarea 
+                                    type="text" 
+                                    required 
+                                    value={arrInput.description}
+                                    name="description" 
                                     className="form-control" 
                                     onChange={(event) => handleOnChange(event)} />
                             </div>
